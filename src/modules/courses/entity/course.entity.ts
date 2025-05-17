@@ -18,7 +18,7 @@ import { SupervisorCourse } from '@modules/supervisor_course/entity/supervisor_c
 @Entity()
 export class Course extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  courseId: string;
+  id: string;
 
   @Column({ length: 500 })
   name: string;

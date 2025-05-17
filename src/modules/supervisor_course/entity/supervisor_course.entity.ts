@@ -15,7 +15,7 @@ import { Course } from '@modules/courses/entity/course.entity';
 @Entity()
 export class SupervisorCourse extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  supervisorCouserId: string;
+  id: string;
 
   @ManyToOne(() => Course, (course) => course.supervisorCourses)
   @JoinColumn({name: 'courseId'})

@@ -17,7 +17,7 @@ import { UserTask } from '@modules/user_task/entity/user_task.entity';
 @Entity()
 export class UserSubject extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  userCourseId: string;
+  id: string;
 
   @Column({ type: 'enum', enum: EUserSubjectStatus, default: EUserSubjectStatus.NOT_FINISH })
   status: EUserSubjectStatus;

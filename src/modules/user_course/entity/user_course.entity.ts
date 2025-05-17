@@ -15,7 +15,7 @@ import { EUserCourseStatus } from '../enum/index.enum';
 @Entity()
 export class UserCourse extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  userCourseId: string;
+  id: string;
 
   @Column({ type: 'enum', enum: EUserCourseStatus, default: EUserCourseStatus.RESIGN })
   status: EUserCourseStatus;

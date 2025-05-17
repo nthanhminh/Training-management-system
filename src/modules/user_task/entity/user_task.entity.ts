@@ -17,7 +17,7 @@ import { EUserTaskStatus } from '../enum/index.enum';
 @Entity()
 export class UserTask extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  userCourseId: string;
+  id: string;
 
   @Column({ type: 'enum', enum: EUserTaskStatus, default: EUserTaskStatus.NOT_FINISH })
   status: EUserTaskStatus;

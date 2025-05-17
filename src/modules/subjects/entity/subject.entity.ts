@@ -16,7 +16,7 @@ import { CourseSubject } from '@modules/course_subject/entity/course_subject.ent
 @Entity()
 export class Subject extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  subjectId: string;
+  id: string;
 
   @Column({ length: 500 })
   name: string;

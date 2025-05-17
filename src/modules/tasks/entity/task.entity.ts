@@ -9,14 +9,13 @@ import {
   OneToMany,
 } from 'typeorm';
 import { BaseEntity } from '@modules/shared/base/base.entity';
-import { User } from '@modules/users/entity/user.entity';
 import { Subject } from '@modules/subjects/entity/subject.entity';
 import { UserTask } from '@modules/user_task/entity/user_task.entity';
 
 @Entity()
 export class Task extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  taskId: string;
+  id: string;
 
   @Column({ length: 500 })
   contentFileLink: string;
