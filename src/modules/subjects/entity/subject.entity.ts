@@ -8,45 +8,32 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import { ECourseStatus } from '../enum/index.enum';
 import { BaseEntity } from '@modules/shared/base/base.entity';
 import { User } from '@modules/users/entity/user.entity';
+import { Task } from '@modules/tasks/entity/task.entity';
 import { CourseSubject } from '@modules/course_subject/entity/course_subject.entity';
-import { UserCourse } from '@modules/user_course/entity/user_course.entity';
-import { SupervisorCourse } from '@modules/supervisor_course/entity/supervisor_course.entity';
 
 @Entity()
-export class Course extends BaseEntity {
+export class Subject extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  courseId: string;
+  subjectId: string;
 
   @Column({ length: 500 })
   name: string;
 
-  @Column({ type: 'enum', enum: ECourseStatus, default: ECourseStatus.ACTIVE })
-  status: ECourseStatus;
-
   @Column('text')
   description: string;
 
-  @Column({ type: 'date' })
-  startDate: Date
-
-  @Column({ type: 'date' })
-  endDate: Date
-
   @ManyToOne(() => User, (user) => user.coursesCreated)
-  @JoinColumn({ name : 'creatorId'})
+  @JoinColumn({name: 'creatorId'})
   creator: User
+
+  @OneToMany(() => Task, (task) => task.subject)
+  tasksCreated: Task[]
 
   @OneToMany(() => CourseSubject, (courseSubject) => courseSubject.course)
   courseSubjects: CourseSubject
-
-  @OneToMany(() => UserCourse, (userCourse) => userCourse.course)
-  userCourses: UserCourse[]
-
-  @OneToMany(() => SupervisorCourse, (supervisorCourse) => supervisorCourse.course)
-  supervisorCourses: SupervisorCourse[]
+  
 
   @CreateDateColumn()
   createdAt: Date;

@@ -11,6 +11,14 @@ import { HttpErrorFilter } from './interceptors/httpError.filter';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { TransformInterceptor } from './interceptors/transform.interceptor';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
+import { CourseModule } from '@modules/courses/course.module';
+import { TaskModule } from '@modules/tasks/task.module';
+import { SubjectModule } from '@modules/subjects/subjects.module';
+import { UserCourseModule } from '@modules/user_course/user_course.module';
+import { UserSubjectModule } from '@modules/user_subject/user_subject.module';
+import { UserTaskModule } from '@modules/user_task/user_task.module';
+import { SupervisorCourseModule } from '@modules/supervisor_course/supervisor_course.module';
+import { CourseSubjectModule } from '@modules/course_subject/course_subject.module';
 // import { AuthModule } from './auth/auth.module';
 
 @Module({
@@ -53,8 +61,14 @@ import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
     }),
     DatabaseModule,
     UserModule,
-    // AuthModule,
-    // AuthModule,
+    CourseModule,
+    TaskModule,
+    SubjectModule,
+    CourseSubjectModule,
+    UserCourseModule,
+    UserSubjectModule,
+    UserTaskModule,
+    SupervisorCourseModule,
   ],
   controllers: [AppController],
   providers: [
