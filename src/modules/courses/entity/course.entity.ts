@@ -23,7 +23,7 @@ export class Course extends BaseEntity {
   @Column({ length: 500 })
   name: string;
 
-  @Column({ type: 'enum', enum: ECourseStatus, default: ECourseStatus.ACTIVE })
+  @Column({ type: 'enum', enum: ECourseStatus, default: ECourseStatus.DISABLED })
   status: ECourseStatus;
 
   @Column('text')

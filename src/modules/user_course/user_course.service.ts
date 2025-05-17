@@ -7,7 +7,7 @@ import { UserCourseRepository } from "@repositories/user_course.repository";
 export class UserCourseService extends BaseServiceAbstract<UserCourse> {
     constructor(
         @Inject('USER_COURSE_REPOSITORY')
-        private readonly userCourseRepository: UserCourseRepository
+        private readonly userCourseRepository: UserCourseRepository,
     ) {
         super(userCourseRepository);
     }
