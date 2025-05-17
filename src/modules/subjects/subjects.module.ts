@@ -9,7 +9,13 @@ import { SubjectController } from './subject.controller';
 import { CourseSubjectModule } from '@modules/course_subject/course_subject.module';
 
 @Module({
-    imports: [DatabaseModule, SharedModule, UserModule, forwardRef(() => TaskModule), CourseSubjectModule],
+    imports: [
+        DatabaseModule,
+        SharedModule,
+        UserModule,
+        forwardRef(() => TaskModule),
+        forwardRef(() => CourseSubjectModule),
+    ],
     providers: [...subjectProviders, SubjectService],
     controllers: [SubjectController],
     exports: [SubjectService],
