@@ -37,9 +37,6 @@ export class UserSubject extends BaseEntity {
     @OneToMany(() => UserTask, (userTask) => userTask.userSubject)
     userTasks: UserTask[];
 
-    @Column({ type: 'float' })
-    subjectProgress: number;
-
     @CreateDateColumn()
     createdAt: Date;
 

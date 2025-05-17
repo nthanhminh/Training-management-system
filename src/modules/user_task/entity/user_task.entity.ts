@@ -33,9 +33,6 @@ export class UserTask extends BaseEntity {
     @JoinColumn({ name: 'taskId' })
     task: Task;
 
-    @Column({ type: 'float' })
-    subjectProgress: number;
-
     @CreateDateColumn()
     createdAt: Date;
 
