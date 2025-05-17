@@ -1,3 +1,4 @@
 {
-    "Unauthorized": "Bạn không có quyền thực hiện hành động này"
+  "Unauthorized": "Bạn không có quyền truy cập",
+  "Forbidden Resource": "Tài nguyên bị cấm"
 }

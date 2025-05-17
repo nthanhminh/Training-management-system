@@ -3,5 +3,6 @@
     "Email is exists": "Email đã tồn tại",
     "Please using correct platform": "Vui lòng sử dụng đúng nền tảng",
     "Email or Password is not correct": "Email hoặc mật khẩu không đúng",
-    "Email is not exists": "Email không tồn tại"
+    "Email is not exists": "Email không tồn tại",
+    "Unauthorized": "Bạn không có quyền truy cập"
 }

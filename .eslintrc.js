@@ -25,8 +25,26 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
 
     // Indent 2 spaces
-    'indent': ["error", 4, { "SwitchCase": 1, "ignoredNodes": ["PropertyDefinition"] }],
-    '@typescript-eslint/indent': ["error", 4, { "SwitchCase": 1, "ignoredNodes": ["PropertyDefinition"] }],
+    'indent': [
+        "error", 4, 
+        {
+        SwitchCase: 1,
+        ignoredNodes: [
+          'Decorator',
+          'PropertyDefinition[decorators.length > 0]'
+        ]
+      }
+    ],
+    '@typescript-eslint/indent': [
+      "error", 4, 
+      {
+        SwitchCase: 1,
+        ignoredNodes: [
+          'Decorator',
+          'PropertyDefinition[decorators.length > 0]'
+        ]
+      }
+    ],
 
     'prettier/prettier': [
       'error', 

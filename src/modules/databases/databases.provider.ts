@@ -23,7 +23,7 @@ export const databaseProviders = [
                 password,
                 database,
                 entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-                synchronize: true,
+                synchronize: false,
             });
 
             return dataSource.initialize();
