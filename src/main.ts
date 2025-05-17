@@ -3,19 +3,27 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as session from 'express-session';
 import * as passport from 'passport';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const configService = app.get(ConfigService);
+  const sessionSecret = configService.get<string>('SESSION_SECRET');
+  console.log("sessionSecret", sessionSecret);
+
   app.use(session({
-    secret: 'JDVADKVBSDAOWEIFJDSVBDSFHBVDJF',
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 60000,
-      secure: true
+      maxAge: 3600000,
+      secure: false
     }
-  }))
+  }));
+
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   const config = new DocumentBuilder()
     .setTitle('Users API')

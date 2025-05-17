@@ -19,6 +19,8 @@ import { UserSubjectModule } from '@modules/user_subject/user_subject.module';
 import { UserTaskModule } from '@modules/user_task/user_task.module';
 import { SupervisorCourseModule } from '@modules/supervisor_course/supervisor_course.module';
 import { CourseSubjectModule } from '@modules/course_subject/course_subject.module';
+import { AuthModule } from '@modules/auth/auth.module';
+import { PassportModule } from '@nestjs/passport';
 // import { AuthModule } from './auth/auth.module';
 
 @Module({
@@ -59,6 +61,9 @@ import { CourseSubjectModule } from '@modules/course_subject/course_subject.modu
         AcceptLanguageResolver,
       ],
     }),
+    PassportModule.register({
+      session: true
+    }),
     DatabaseModule,
     UserModule,
     CourseModule,
@@ -69,6 +74,7 @@ import { CourseSubjectModule } from '@modules/course_subject/course_subject.modu
     UserSubjectModule,
     UserTaskModule,
     SupervisorCourseModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [
