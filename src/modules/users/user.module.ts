@@ -6,9 +6,9 @@ import { UsersController } from './user.controller';
 import { SharedModule } from '@modules/shared/shared.module';
 
 @Module({
-  imports: [DatabaseModule, SharedModule],
-  exports: [...userProviders, UsersService],
-  providers: [...userProviders, UsersService],
-  controllers: [UsersController],
+    imports: [DatabaseModule, SharedModule],
+    exports: [...userProviders, UsersService],
+    providers: [...userProviders, UsersService],
+    controllers: [UsersController],
 })
 export class UserModule {}

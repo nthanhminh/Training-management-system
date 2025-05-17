@@ -1,4 +1,4 @@
 export enum ECourseSubjectStatus {
-    START = "START",
-    FINISH = "FINISH"
+    START = 'START',
+    FINISH = 'FINISH',
 }

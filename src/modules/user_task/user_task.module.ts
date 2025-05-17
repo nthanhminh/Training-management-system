@@ -5,9 +5,9 @@ import { UserTaskService } from './user_task.service';
 import { userTaskProviders } from './user_task.provider';
 
 @Module({
-  imports: [DatabaseModule, SharedModule],
-  providers: [...userTaskProviders, UserTaskService],
-  controllers: [],
-  exports: [UserTaskService],
+    imports: [DatabaseModule, SharedModule],
+    providers: [...userTaskProviders, UserTaskService],
+    controllers: [],
+    exports: [UserTaskService],
 })
 export class UserTaskModule {}

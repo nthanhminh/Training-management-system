@@ -8,14 +8,9 @@ import { TaskModule } from '@modules/tasks/task.module';
 import { SubjectController } from './subject.controller';
 
 @Module({
-  imports: [
-    DatabaseModule, 
-    SharedModule, 
-    UserModule,
-    forwardRef(() => TaskModule)
-  ],
-  providers: [...subjectProviders, SubjectService],
-  controllers: [SubjectController],
-  exports: [SubjectService],
+    imports: [DatabaseModule, SharedModule, UserModule, forwardRef(() => TaskModule)],
+    providers: [...subjectProviders, SubjectService],
+    controllers: [SubjectController],
+    exports: [SubjectService],
 })
 export class SubjectModule {}

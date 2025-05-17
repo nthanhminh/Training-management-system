@@ -24,70 +24,67 @@ import { PassportModule } from '@nestjs/passport';
 // import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
-    BullModule.forRoot({
-      connection: {
-        host: 'localhost',
-        port: 6379,
-      },
-    }),
-    MailerModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        transport: {
-          host: configService.get<string>('MAIL_HOST'),
-          service: 'gmail',
-          secure: false,
-          auth: {
-            user: configService.get<string>('MAIL_USER'),
-            pass: configService.get<string>('MAIL_PASSWORD'),
-          },
-          logger: true,
+    imports: [
+        ConfigModule.forRoot({
+            isGlobal: true,
+        }),
+        BullModule.forRoot({
+            connection: {
+                host: 'localhost',
+                port: 6379,
+            },
+        }),
+        MailerModule.forRootAsync({
+            imports: [ConfigModule],
+            useFactory: (configService: ConfigService) => ({
+                transport: {
+                    host: configService.get<string>('MAIL_HOST'),
+                    service: 'gmail',
+                    secure: false,
+                    auth: {
+                        user: configService.get<string>('MAIL_USER'),
+                        pass: configService.get<string>('MAIL_PASSWORD'),
+                    },
+                    logger: true,
+                },
+            }),
+            inject: [ConfigService],
+        }),
+        I18nModule.forRoot({
+            fallbackLanguage: 'en',
+            loaderOptions: {
+                path: 'src/i18n/',
+                watch: true,
+            },
+            resolvers: [{ use: QueryResolver, options: ['lang'] }, AcceptLanguageResolver],
+        }),
+        PassportModule.register({
+            session: true,
+        }),
+        DatabaseModule,
+        UserModule,
+        CourseModule,
+        TaskModule,
+        SubjectModule,
+        CourseSubjectModule,
+        UserCourseModule,
+        UserSubjectModule,
+        UserTaskModule,
+        SupervisorCourseModule,
+        AuthModule,
+    ],
+    controllers: [AppController],
+    providers: [
+        AppService,
+        AppService,
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: TransformInterceptor,
         },
-      }),
-      inject: [ConfigService],
-    }),
-    I18nModule.forRoot({
-      fallbackLanguage: 'en',
-      loaderOptions: {
-        path: 'src/i18n/',
-        watch: true,
-      },
-      resolvers: [
-        { use: QueryResolver, options: ['lang'] },
-        AcceptLanguageResolver,
-      ],
-    }),
-    PassportModule.register({
-      session: true
-    }),
-    DatabaseModule,
-    UserModule,
-    CourseModule,
-    TaskModule,
-    SubjectModule,
-    CourseSubjectModule,
-    UserCourseModule,
-    UserSubjectModule,
-    UserTaskModule,
-    SupervisorCourseModule,
-    AuthModule
-  ],
-  controllers: [AppController],
-  providers: [
-    AppService,
-    AppService,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: TransformInterceptor,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: HttpErrorFilter,
-    },
-  ],
+        {
+            provide: APP_FILTER,
+            useClass: HttpErrorFilter,
+        },
+    ],
 })
 export class AppModule {}

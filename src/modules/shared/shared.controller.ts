@@ -3,5 +3,5 @@ import { SharedService } from './shared.service';
 
 @Controller('shared')
 export class SharedController {
-  constructor(private readonly sharedService: SharedService) {}
+    constructor(private readonly sharedService: SharedService) {}
 }

@@ -5,9 +5,9 @@ import { SupervisorCourseService } from './supervisor_course.service';
 import { supervisorCourseProviders } from './supervisor_course.provider';
 
 @Module({
-  imports: [DatabaseModule, SharedModule],
-  providers: [...supervisorCourseProviders, SupervisorCourseService],
-  controllers: [],
-  exports: [SupervisorCourseService],
+    imports: [DatabaseModule, SharedModule],
+    providers: [...supervisorCourseProviders, SupervisorCourseService],
+    controllers: [],
+    exports: [SupervisorCourseService],
 })
 export class SupervisorCourseModule {}

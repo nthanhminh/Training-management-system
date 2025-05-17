@@ -1,11 +1,13 @@
+const { EndOfLineState } = require("typescript");
+
 module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: 'tsconfig.json',
+    project: './tsconfig.json',
     tsconfigRootDir: __dirname,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint/eslint-plugin'],
+  plugins: ['@typescript-eslint'],
   extends: [
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
@@ -21,5 +23,24 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-unused-vars': ['warn', { 
+      argsIgnorePattern: '^_', 
+      varsIgnorePattern: '^_' 
+    }],
+
+    // Indent 2 spaces
+    'indent': ["error", 4, { "SwitchCase": 1, "ignoredNodes": ["PropertyDefinition"] }],
+    '@typescript-eslint/indent': ["error", 4, { "SwitchCase": 1, "ignoredNodes": ["PropertyDefinition"] }],
+
+    'prettier/prettier': [
+      'error', 
+      { printWidth: 120, EndOfLineState: 'LF' }
+    ],
+
+    // Giới hạn độ dài dòng 80 ký tự, bỏ qua URL
+    // 'max-len': ['error', { code: 80, ignoreUrls: true }],
+
+    // Bắt buộc có dòng trống cuối file
+    'eol-last': ['error', 'always'],
   },
 };

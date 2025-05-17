@@ -1,7 +1,7 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { BaseServiceAbstract } from "src/services/base/base.abstract.service";
-import { UserCourse } from "./entity/user_course.entity";
-import { UserCourseRepository } from "@repositories/user_course.repository";
+import { Inject, Injectable } from '@nestjs/common';
+import { BaseServiceAbstract } from 'src/services/base/base.abstract.service';
+import { UserCourse } from './entity/user_course.entity';
+import { UserCourseRepository } from '@repositories/user_course.repository';
 
 @Injectable()
 export class UserCourseService extends BaseServiceAbstract<UserCourse> {

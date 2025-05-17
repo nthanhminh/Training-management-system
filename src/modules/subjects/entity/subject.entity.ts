@@ -1,12 +1,12 @@
 import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  DeleteDateColumn,
-  ManyToOne,
-  JoinColumn,
-  OneToMany,
+    Entity,
+    Column,
+    PrimaryGeneratedColumn,
+    CreateDateColumn,
+    DeleteDateColumn,
+    ManyToOne,
+    JoinColumn,
+    OneToMany,
 } from 'typeorm';
 import { BaseEntity } from '@modules/shared/base/base.entity';
 import { User } from '@modules/users/entity/user.entity';
@@ -15,29 +15,28 @@ import { CourseSubject } from '@modules/course_subject/entity/course_subject.ent
 
 @Entity()
 export class Subject extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
-  @Column({ length: 500 })
-  name: string;
+    @Column({ length: 500 })
+    name: string;
 
-  @Column('text')
-  description: string;
+    @Column('text')
+    description: string;
 
-  @ManyToOne(() => User, (user) => user.coursesCreated)
-  @JoinColumn({name: 'creatorId'})
-  creator: User
+    @ManyToOne(() => User, (user) => user.coursesCreated)
+    @JoinColumn({ name: 'creatorId' })
+    creator: User;
 
-  @OneToMany(() => Task, (task) => task.subject)
-  tasksCreated: Task[]
+    @OneToMany(() => Task, (task) => task.subject)
+    tasksCreated: Task[];
 
-  @OneToMany(() => CourseSubject, (courseSubject) => courseSubject.course)
-  courseSubjects: CourseSubject
-  
+    @OneToMany(() => CourseSubject, (courseSubject) => courseSubject.course)
+    courseSubjects: CourseSubject;
 
-  @CreateDateColumn()
-  createdAt: Date;
+    @CreateDateColumn()
+    createdAt: Date;
 
-  @DeleteDateColumn()
-  deletedAt: Date | null;
+    @DeleteDateColumn()
+    deletedAt: Date | null;
 }

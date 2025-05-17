@@ -1,17 +1,17 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsMongoId, IsNotEmpty, IsUUID } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsMongoId, IsNotEmpty, IsUUID } from 'class-validator';
 
 export class CreateTaskDto {
     @ApiProperty({
-        required: true
+        required: true,
     })
     @IsNotEmpty()
-    contentFileLink: string
+    contentFileLink: string;
 
     @ApiProperty({
-        required: true
+        required: true,
     })
     @IsNotEmpty()
     @IsUUID('4')
-    subjectId: string
+    subjectId: string;
 }

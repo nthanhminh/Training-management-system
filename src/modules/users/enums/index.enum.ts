@@ -1,9 +1,9 @@
 export enum ERolesUser {
-  SUPERVISOR = 'SUPERVISOR',
-  TRAINEE = 'TRAINEE',
+    SUPERVISOR = 'SUPERVISOR',
+    TRAINEE = 'TRAINEE',
 }
 
 export enum EStatusUser {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
+    ACTIVE = 'ACTIVE',
+    INACTIVE = 'INACTIVE',
 }

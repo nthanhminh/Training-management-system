@@ -7,34 +7,34 @@ import { UpdateUserDto } from './dto/updateUser.dto';
 
 @Injectable()
 export class UsersService extends BaseServiceAbstract<User> {
-  constructor(
-    @Inject('USER_REPOSITORY')
-    private readonly userRepository: UserRepository,
-  ) {
-    super(userRepository);
-  }
-  async create(dto: CreateNewUserDto): Promise<User> {
-    return await this.userRepository.create(dto);
-  }
+    constructor(
+        @Inject('USER_REPOSITORY')
+        private readonly userRepository: UserRepository,
+    ) {
+        super(userRepository);
+    }
+    async create(dto: CreateNewUserDto): Promise<User> {
+        return await this.userRepository.create(dto);
+    }
 
-  async updateUser(dto: UpdateUserDto, user: User): Promise<User> {
-    await this.userRepository.update(user.id, dto);
-    return await this.userRepository.findOneById(user.id);
-  }
+    async updateUser(dto: UpdateUserDto, user: User): Promise<User> {
+        await this.userRepository.update(user.id, dto);
+        return await this.userRepository.findOneById(user.id);
+    }
 
-  async findUserById(id: string): Promise<User> {
-    return await this.userRepository.findOneById(id);
-  }
+    async findUserById(id: string): Promise<User> {
+        return await this.userRepository.findOneById(id);
+    }
 
-  async findByEmail(email: string): Promise<User | null> {
-    return await this.findOneByCondition({ email });
-  }
+    async findByEmail(email: string): Promise<User | null> {
+        return await this.findOneByCondition({ email });
+    }
 
-  async deleteUser(id: string) {
-    return await this.userRepository.softDelete(id);
-  }
+    async deleteUser(id: string) {
+        return await this.userRepository.softDelete(id);
+    }
 
-  async getUserWithRole(userId: string): Promise<User> {
-    return await this.userRepository.findOneById(userId);
-  }
+    async getUserWithRole(userId: string): Promise<User> {
+        return await this.userRepository.findOneById(userId);
+    }
 }

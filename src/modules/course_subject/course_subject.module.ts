@@ -7,14 +7,9 @@ import { CourseModule } from '@modules/courses/course.module';
 import { SubjectModule } from '@modules/subjects/subjects.module';
 
 @Module({
-  imports: [
-    DatabaseModule, 
-    SharedModule,
-    forwardRef(() => CourseModule),
-    SubjectModule
-  ],
-  providers: [...courseSubjectProviders, CourseSubjectService],
-  controllers: [],
-  exports: [CourseSubjectService],
+    imports: [DatabaseModule, SharedModule, forwardRef(() => CourseModule), SubjectModule],
+    providers: [...courseSubjectProviders, CourseSubjectService],
+    controllers: [],
+    exports: [CourseSubjectService],
 })
 export class CourseSubjectModule {}

@@ -1,12 +1,12 @@
 import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  DeleteDateColumn,
-  ManyToOne,
-  JoinColumn,
-  OneToMany,
+    Entity,
+    Column,
+    PrimaryGeneratedColumn,
+    CreateDateColumn,
+    DeleteDateColumn,
+    ManyToOne,
+    JoinColumn,
+    OneToMany,
 } from 'typeorm';
 import { ECourseStatus } from '../enum/index.enum';
 import { BaseEntity } from '@modules/shared/base/base.entity';
@@ -17,40 +17,50 @@ import { SupervisorCourse } from '@modules/supervisor_course/entity/supervisor_c
 
 @Entity()
 export class Course extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
-  @Column({ length: 500 })
-  name: string;
+    @Column({ length: 500 })
+    name: string;
 
-  @Column({ type: 'enum', enum: ECourseStatus, default: ECourseStatus.DISABLED })
-  status: ECourseStatus;
+    @Column({
+        type: 'enum',
+        enum: ECourseStatus,
+        default: ECourseStatus.DISABLED,
+    })
+    status: ECourseStatus;
 
-  @Column('text')
-  description: string;
+    @Column('text')
+    description: string;
 
-  @Column({ type: 'date' })
-  startDate: Date
+    @Column({ type: 'date' })
+    startDate: Date;
 
-  @Column({ type: 'date' })
-  endDate: Date
+    @Column({ type: 'date' })
+    endDate: Date;
 
-  @ManyToOne(() => User, (user) => user.coursesCreated)
-  @JoinColumn({ name : 'creatorId'})
-  creator: User
+    @Column({
+        type: 'varchar',
+        default: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmhsQhiqmHF_i2Cli8YrXow7xhEjVqcTKTjw&s',
+    })
+    image: string;
 
-  @OneToMany(() => CourseSubject, (courseSubject) => courseSubject.course)
-  courseSubjects: CourseSubject
+    @ManyToOne(() => User, (user) => user.coursesCreated)
+    @JoinColumn({ name: 'creatorId' })
+    creator: User;
 
-  @OneToMany(() => UserCourse, (userCourse) => userCourse.course)
-  userCourses: UserCourse[]
+    @OneToMany(() => CourseSubject, (courseSubject) => courseSubject.course)
+    courseSubjects: CourseSubject;
 
-  @OneToMany(() => SupervisorCourse, (supervisorCourse) => supervisorCourse.course)
-  supervisorCourses: SupervisorCourse[]
+    @OneToMany(() => UserCourse, (userCourse) => userCourse.course)
+    userCourses: UserCourse[];
 
-  @CreateDateColumn()
-  createdAt: Date;
+    @OneToMany(() => SupervisorCourse, (supervisorCourse) => supervisorCourse.course)
+    supervisorCourses: SupervisorCourse[];
 
-  @DeleteDateColumn()
-  deletedAt: Date | null;
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @DeleteDateColumn()
+    deletedAt: Date | null;
 }

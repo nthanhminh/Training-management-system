@@ -1,4 +1,4 @@
 export enum EEnvironment {
-    SUPERVISOR = "SUPERVISOR",
-    TRAINEE = "TRAINEE"
+    SUPERVISOR = 'SUPERVISOR',
+    TRAINEE = 'TRAINEE',
 }

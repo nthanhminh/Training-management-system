@@ -1,4 +1,4 @@
 export enum ECourseStatus {
-    ACTIVE = "ACTIVE",
-    DISABLED = "DISABLED"
+    ACTIVE = 'ACTIVE',
+    DISABLED = 'DISABLED',
 }

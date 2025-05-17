@@ -1,32 +1,32 @@
-import { ApiProperty, OmitType } from "@nestjs/swagger";
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsStrongPassword } from "class-validator";
-import { EEnvironment } from "../enum/index.enum";
-import { ERolesUser } from "@modules/users/enums/index.enum";
+import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsStrongPassword } from 'class-validator';
+import { EEnvironment } from '../enum/index.enum';
+import { ERolesUser } from '@modules/users/enums/index.enum';
 
 export class BaseAuthDto {
     @ApiProperty({
         default: 'trainee@gmail.com',
-        required: true
+        required: true,
     })
     @IsNotEmpty()
     @IsEmail()
-    email: string
+    email: string;
 
     @ApiProperty({
         default: EEnvironment.TRAINEE,
         required: true,
-        enum: EEnvironment
+        enum: EEnvironment,
     })
     @IsEnum(EEnvironment)
-    environment: EEnvironment
+    environment: EEnvironment;
 
     @ApiProperty({
         default: ERolesUser.TRAINEE,
         required: true,
-        enum: ERolesUser
+        enum: ERolesUser,
     })
     @IsEnum(ERolesUser)
-    role: ERolesUser
+    role: ERolesUser;
 }
 
 export class SignInDto extends BaseAuthDto {
@@ -35,7 +35,7 @@ export class SignInDto extends BaseAuthDto {
         default: 'Test@#123',
     })
     @IsNotEmpty()
-    password: string
+    password: string;
 }
 
 export class SignUpDto extends BaseAuthDto {
@@ -45,12 +45,12 @@ export class SignUpDto extends BaseAuthDto {
     })
     @IsNotEmpty()
     @IsStrongPassword()
-    password: string
+    password: string;
 
     @ApiProperty({
         required: true,
         default: 'trainee',
     })
     @IsNotEmpty()
-    name: string
+    name: string;
 }
