@@ -26,9 +26,6 @@ export class CourseSubject extends BaseEntity {
     })
     status: ECourseSubjectStatus;
 
-    @Column({ type: 'varchar' })
-    image: string;
-
     @ManyToOne(() => Course, (course) => course.courseSubjects)
     @JoinColumn({ name: 'courseId' })
     course: Course;

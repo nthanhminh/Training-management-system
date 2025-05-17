@@ -7,7 +7,7 @@ import {
     OneToMany,
     BaseEntity,
 } from 'typeorm';
-import { ERolesUser } from '../enums/index.enum';
+import { ERolesUser, EStatusUser } from '../enums/index.enum';
 import { Course } from '@modules/courses/entity/course.entity';
 import { Subject } from '@modules/subjects/entity/subject.entity';
 import { UserCourse } from '@modules/user_course/entity/user_course.entity';
@@ -42,6 +42,9 @@ export class User extends BaseEntity {
 
     @Column('text')
     email: string;
+
+    @Column({ type: 'enum', enum: EStatusUser, default: EStatusUser.ACTIVE })
+    status: EStatusUser;
 
     @Column('text')
     password: string;
