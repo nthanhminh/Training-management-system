@@ -4,6 +4,6 @@ export abstract class BaseEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ nullable: true })
-    deletedAt?: Date;
+    // @Column({ nullable: true })
+    // deletedAt?: Date;
 }
