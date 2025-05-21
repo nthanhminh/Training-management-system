@@ -27,7 +27,7 @@ export class UserTask extends BaseEntity {
 
     @ManyToOne(() => UserSubject, (userSubject) => userSubject.userTasks)
     @JoinColumn({ name: 'userSubjectId' })
-    userSubject: CourseSubject;
+    userSubject: UserSubject;
 
     @ManyToOne(() => Task, (task) => task.userTasks)
     @JoinColumn({ name: 'taskId' })
