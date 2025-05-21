@@ -85,29 +85,6 @@ export class CourseService extends BaseServiceAbstract<Course> {
         };
     }
 
-    async test(courseId: string) {
-        const course = await this._getCourseDetail(courseId);
-        return {
-            data: await this._getSubjectsAndTaskListFromCourseDetail(course),
-        };
-    }
-
-    // async deleteTraineeForCourse(userCourseId: string, user: User): Promise<AppResponse<boolean>> {
-    //     const userCourse = await this.userCourseService.findOneByCondition(
-    //         { id: userCourseId },
-    //         { relations: ['course'] },
-    //     );
-    //     await this._checkUserIsSupervisorOfCourse(userCourse.course.id, user);
-    //     try {
-    //         return {
-    //             data: await this.userCourseService.remove(userCourseId),
-    //         };
-    //     } catch (error) {
-    //         console.log(error);
-    //         throw new UnprocessableEntityException('courses.Remove trainee failed');
-    //     }
-    // }
-
     async deleteTraineeForCourse(userCourseId: string, user: User): Promise<AppResponse<boolean>> {
         const userCourse = await this.userCourseService.findOneByCondition(
             { id: userCourseId },

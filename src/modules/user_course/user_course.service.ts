@@ -3,9 +3,9 @@ import { BaseServiceAbstract } from 'src/services/base/base.abstract.service';
 import { UserCourse } from './entity/user_course.entity';
 import { UserCourseRepository } from '@repositories/user_course.repository';
 import { User } from '@modules/users/entity/user.entity';
-import { AppResponse } from 'src/types/common.type';
 import { ERolesUser } from '@modules/users/enums/index.enum';
 import { EUserCourseStatus } from './enum/index.enum';
+import { UpdateResult } from 'typeorm';
 
 @Injectable()
 export class UserCourseService extends BaseServiceAbstract<UserCourse> {
@@ -39,6 +39,16 @@ export class UserCourseService extends BaseServiceAbstract<UserCourse> {
             status: EUserCourseStatus.IN_PROGRESS,
             courseProgress: 0,
             enrollDate: new Date(),
+        });
+    }
+
+    async updateUserCourseProgress(courseId: string, userId: string, progress: number): Promise<UpdateResult> {
+        const userCourse = await this.userCourseRepository.findOneByCondition({
+            course: { id: courseId },
+            user: { id: userId },
+        });
+        return await this.userCourseRepository.update(userCourse.id, {
+            courseProgress: progress,
         });
     }
 }

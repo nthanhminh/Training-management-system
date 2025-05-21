@@ -26,10 +26,7 @@ export class UserSubject extends BaseEntity {
     })
     status: EUserSubjectStatus;
 
-    @ManyToOne(
-        () => CourseSubject,
-        (courseSubject) => courseSubject.userSubjects,
-    )
+    @ManyToOne(() => CourseSubject, (courseSubject) => courseSubject.userSubjects)
     @JoinColumn({ name: 'courseSubjectId' })
     courseSubject: CourseSubject;
 
