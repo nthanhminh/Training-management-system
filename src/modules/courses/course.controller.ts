@@ -96,6 +96,16 @@ export class CourseController {
         return await this.courseService.getCourseDetailForTrainee(courseId, user);
     }
 
+    @Roles(ERolesUser.TRAINEE)
+    @UseGuards(SessionAuthGuard, RolesGuard)
+    @Get('trainee/members')
+    async getMemberOfCourseByTrainee(
+        @Query('courseId') courseId: string,
+        @CurrentUserDecorator() user: User,
+    ): Promise<AppResponse<string[]>> {
+        return await this.courseService.getMememberOfCourseForTrainee(courseId, user);
+    }
+
     @Post()
     async createCourse(@Body() dto: CreateCourseDto, @CurrentUserDecorator() user: User): Promise<AppResponse<Course>> {
         return {

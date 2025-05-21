@@ -253,6 +253,29 @@ export class CourseService extends BaseServiceAbstract<Course> {
         }
     }
 
+    async getMememberOfCourseForTrainee(courseId: string, user: User): Promise<AppResponse<string[]>> {
+        const userIsTraineeOfCourse = await this.userCourseService.findOneByCondition({
+            user: { id: user.id },
+            course: { id: courseId },
+        });
+        if (!userIsTraineeOfCourse) {
+            throw new ForbiddenException('auths.Forbidden Resource');
+        }
+        const memberOfCourse = (
+            await this.userCourseService.findAll(
+                {
+                    course: { id: courseId },
+                },
+                {
+                    relations: ['user'],
+                },
+            )
+        ).items.map((userCourse) => userCourse.user.name);
+        return {
+            data: memberOfCourse,
+        };
+    }
+
     async getCourseDetailForTrainee(courseId: string, user: User): Promise<AppResponse<Course>> {
         const userIsTraineeOfCourse = await this.userCourseService.findOneByCondition({
             user: { id: user.id },
