@@ -157,4 +157,9 @@ export class CourseController {
             data: await this.courseService.deleteSubjectForCourse(id, dto, user),
         };
     }
+
+    @Get('test')
+    async test(@Query('courseId') courseId: string) {
+        return await this.courseService.test(courseId);
+    }
 }

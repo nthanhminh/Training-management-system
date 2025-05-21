@@ -3,7 +3,7 @@ import { BaseServiceAbstract } from 'src/services/base/base.abstract.service';
 import { UserCourse } from './entity/user_course.entity';
 import { UserCourseRepository } from '@repositories/user_course.repository';
 import { User } from '@modules/users/entity/user.entity';
-import { AppResponse, ResponseMessage } from 'src/types/common.type';
+import { AppResponse } from 'src/types/common.type';
 import { ERolesUser } from '@modules/users/enums/index.enum';
 import { EUserCourseStatus } from './enum/index.enum';
 
@@ -16,7 +16,7 @@ export class UserCourseService extends BaseServiceAbstract<UserCourse> {
         super(userCourseRepository);
     }
 
-    async handleAddTraineeForCouse(user: User, courseId: string): Promise<AppResponse<UserCourse>> {
+    async handleAddTraineeForCouse(user: User, courseId: string): Promise<UserCourse> {
         if (user.role !== ERolesUser.TRAINEE) {
             throw new UnprocessableEntityException("courses.Please enter correct the trainee's email");
         }
@@ -33,14 +33,12 @@ export class UserCourseService extends BaseServiceAbstract<UserCourse> {
             }
         }
 
-        return {
-            data: await this.userCourseRepository.create({
-                user: { id: user.id },
-                course: { id: courseId },
-                status: EUserCourseStatus.IN_PROGRESS,
-                courseProgress: 0,
-                enrollDate: new Date(),
-            }),
-        };
+        return await this.userCourseRepository.create({
+            user: { id: user.id },
+            course: { id: courseId },
+            status: EUserCourseStatus.IN_PROGRESS,
+            courseProgress: 0,
+            enrollDate: new Date(),
+        });
     }
 }
