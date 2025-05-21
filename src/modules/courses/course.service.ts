@@ -125,6 +125,34 @@ export class CourseService extends BaseServiceAbstract<Course> {
         return await queryBuilder.getMany();
     }
 
+    async getCourseForTrainee(dto: FindCourseDto, user: User): Promise<AppResponse<Course[]>> {
+        const { name, creatorName, page, pageSize } = dto;
+        const { limit, skip } = getLimitAndSkipHelper(page, pageSize);
+
+        const queryBuilder = this.courseRepository
+            .createQueryBuilder('course')
+            .innerJoinAndSelect('course.userCourses', 'userCourses')
+            .where('userCourses.userId = :userId', { userId: user.id });
+
+        if (name) {
+            queryBuilder.andWhere('course.name ILIKE :name', {
+                name: `%${name}%`,
+            });
+        }
+
+        if (creatorName) {
+            queryBuilder.andWhere('creator.name ILIKE :creatorName', {
+                creatorName: `%${creatorName}%`,
+            });
+        }
+
+        queryBuilder.skip(skip).take(limit);
+
+        return {
+            data: await queryBuilder.getMany(),
+        };
+    }
+
     async _getCourseDetail(courseId: string): Promise<Course> {
         const course = await this.courseRepository
             .createQueryBuilder('course')
@@ -154,6 +182,20 @@ export class CourseService extends BaseServiceAbstract<Course> {
             return await this._getCourseDetail(courseId);
         } else {
             throw new ForbiddenException('auths.Forbidden Resource');
+        }
+    }
+
+    async getCourseDetailForTrainee(courseId: string, user: User): Promise<AppResponse<Course>> {
+        const userIsTraineeOfCourse = await this.userCourseService.findOneByCondition({
+            user: { id: user.id },
+            course: { id: courseId },
+        });
+        if (!userIsTraineeOfCourse) {
+            throw new ForbiddenException('auths.Forbidden Resource');
+        } else {
+            return {
+                data: await this._getCourseDetail(courseId),
+            };
         }
     }
 

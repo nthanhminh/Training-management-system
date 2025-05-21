@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateCourseDto } from './dto/createCourse.dto';
-import { AppResponse, ResponseMessage } from 'src/types/common.type';
+import { AppResponse } from 'src/types/common.type';
 import { CourseService } from './course.service';
 import { Course } from './entity/course.entity';
 import { CurrentUserDecorator } from 'src/decorators/current-user.decorator';
@@ -28,7 +28,7 @@ import { UserCourse } from '@modules/user_course/entity/user_course.entity';
 export class CourseController {
     constructor(private readonly courseService: CourseService) {}
 
-    @Get('supervisor')
+    @Get('supervisor/list')
     async getCourseBySupervisor(
         @Query() dto: FindCourseDto,
         @CurrentUserDecorator() user: User,
@@ -38,9 +38,9 @@ export class CourseController {
         };
     }
 
-    @Get('supervisor/:courseId')
+    @Get('supervisor/detail')
     async getCourseDetailBySupervisor(
-        @Param('courseId') courseId: string,
+        @Query('courseId') courseId: string,
         @CurrentUserDecorator() user: User,
     ): Promise<AppResponse<Course>> {
         return {
@@ -50,14 +50,14 @@ export class CourseController {
 
     @Roles(ERolesUser.SUPERVISOR)
     @UseGuards(SessionAuthGuard, RolesGuard)
-    @Post('trainee')
+    @Post('supervisor/trainee')
     async addTrainee(@Body() dto: TraineeDto, @CurrentUserDecorator() user: User): Promise<AppResponse<UserCourse>> {
         return await this.courseService.addTraineeForCourse(dto, user);
     }
 
     @Roles(ERolesUser.SUPERVISOR)
     @UseGuards(SessionAuthGuard, RolesGuard)
-    @Patch('trainee/:userCourseId')
+    @Patch('supervisor/trainee/:userCourseId')
     async updateTrainee(
         @Param('userCourseId') userCourseId: string,
         @CurrentUserDecorator() user: User,
@@ -68,12 +68,32 @@ export class CourseController {
 
     @Roles(ERolesUser.SUPERVISOR)
     @UseGuards(SessionAuthGuard, RolesGuard)
-    @Delete('trainee/:userCourseId')
+    @Delete('supervisor/trainee/:userCourseId')
     async removeTrainee(
         @Param('userCourseId') userCourseId: string,
         @CurrentUserDecorator() user: User,
     ): Promise<AppResponse<boolean>> {
         return await this.courseService.deleteTraineeForCourse(userCourseId, user);
+    }
+
+    @Roles(ERolesUser.TRAINEE)
+    @UseGuards(SessionAuthGuard, RolesGuard)
+    @Get('trainee/list')
+    async getCourseByTrainee(
+        @Query() dto: FindCourseDto,
+        @CurrentUserDecorator() user: User,
+    ): Promise<AppResponse<Course[]>> {
+        return await this.courseService.getCourseForTrainee(dto, user);
+    }
+
+    @Roles(ERolesUser.TRAINEE)
+    @UseGuards(SessionAuthGuard, RolesGuard)
+    @Get('trainee/detail')
+    async getCourseDetailByTrainee(
+        @Query('courseId') courseId: string,
+        @CurrentUserDecorator() user: User,
+    ): Promise<AppResponse<Course>> {
+        return await this.courseService.getCourseDetailForTrainee(courseId, user);
     }
 
     @Post()
