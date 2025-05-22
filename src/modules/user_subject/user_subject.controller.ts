@@ -7,7 +7,7 @@ import { SessionAuthGuard } from '@modules/auth/guards/session.guard';
 import { RolesGuard } from '@modules/auth/guards/roles.guard';
 import { User } from '@modules/users/entity/user.entity';
 
-@Controller('user_course')
+@Controller('user_subject')
 export class UserSubjectController {
     constructor(private readonly userSubjectService: UserSubjectService) {}
 

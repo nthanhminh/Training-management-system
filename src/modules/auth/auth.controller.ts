@@ -27,9 +27,7 @@ export class AuthController {
     }
 
     @Get('status')
-    async getAuthStatus(@Request() req: RequestWithUser): Promise<AppResponse<any>> {
-        return {
-            data: req.user,
-        };
+    async getAuthStatus(@Request() req: RequestWithUser): Promise<AppResponse<boolean>> {
+        return await this.authService.checkLoginStatus(req);
     }
 }

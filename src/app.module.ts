@@ -21,6 +21,7 @@ import { SupervisorCourseModule } from '@modules/supervisor_course/supervisor_co
 import { CourseSubjectModule } from '@modules/course_subject/course_subject.module';
 import { AuthModule } from '@modules/auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
+import { PageController } from './controllers/page.controller';
 // import { AuthModule } from './auth/auth.module';
 
 @Module({
@@ -73,7 +74,7 @@ import { PassportModule } from '@nestjs/passport';
         SupervisorCourseModule,
         AuthModule,
     ],
-    controllers: [AppController],
+    controllers: [AppController, PageController],
     providers: [
         AppService,
         AppService,

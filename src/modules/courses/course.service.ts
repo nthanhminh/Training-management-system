@@ -72,7 +72,7 @@ export class CourseService extends BaseServiceAbstract<Course> {
         const courseDetail = await this._getCourseDetail(courseId);
         const courseSubjectsDetail = await this._getSubjectsAndTaskListFromCourseDetail(courseDetail);
         for (let i = 0; i < courseSubjectsDetail.length; i++) {
-            const courseSubject = courseSubjectsDetail[0];
+            const courseSubject = courseSubjectsDetail[i];
             const userSubject = await this.userSubjectService.addTraineeForUserSubject(
                 courseSubject.courseSubjectId,
                 trainee,
@@ -206,6 +206,29 @@ export class CourseService extends BaseServiceAbstract<Course> {
         };
     }
 
+    private async _getCourseDetailForTrainee(courseId: string, user: User) {
+        const course = await this.courseRepository
+            .createQueryBuilder('course')
+            .leftJoinAndSelect('course.courseSubjects', 'courseSubject')
+            .leftJoinAndSelect('courseSubject.subject', 'subject')
+            .leftJoinAndSelect(
+                'courseSubject.userSubjects',
+                'userSubject',
+                'userSubject.userId = :userId AND userSubject.courseSubjectId = courseSubject.id',
+                { userId: user.id }
+            )
+            .leftJoinAndSelect('userSubject.userTasks', 'userTask')
+            .leftJoinAndSelect('userTask.task', 'task', 'userTask.userSubjectId = userSubject.id')
+            .where('course.id = :courseId', { courseId })
+            .getOne();
+
+        if (!course) {
+            throw new NotFoundException('courses.Course not found');
+        }
+
+        return course;
+    }
+
     async _getCourseDetail(courseId: string): Promise<Course> {
         const course = await this.courseRepository
             .createQueryBuilder('course')
@@ -285,7 +308,7 @@ export class CourseService extends BaseServiceAbstract<Course> {
             throw new ForbiddenException('auths.Forbidden Resource');
         } else {
             return {
-                data: await this._getCourseDetail(courseId),
+                data: await this._getCourseDetailForTrainee(courseId, user),
             };
         }
     }

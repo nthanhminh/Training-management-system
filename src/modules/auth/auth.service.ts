@@ -2,6 +2,7 @@ import { UsersService } from '@modules/users/user.services';
 import {
     Injectable,
     NotFoundException,
+    Req,
     UnauthorizedException,
     UnprocessableEntityException,
     UseGuards,
@@ -12,6 +13,8 @@ import { User } from '@modules/users/entity/user.entity';
 import { LocalAuthGuard } from './guards/local.guard';
 import { EEnvironment } from './enum/index.enum';
 import { ERolesUser, EStatusUser } from '@modules/users/enums/index.enum';
+import { RequestWithUser } from 'src/types/requests.type';
+import { AppResponse } from 'src/types/common.type';
 
 @Injectable()
 export class AuthService {
@@ -79,6 +82,12 @@ export class AuthService {
             return await argon2.verify(hashedPassword, plainTextPassword);
         } catch (err) {
             return false;
+        }
+    }
+
+    async checkLoginStatus(@Req() req: RequestWithUser): Promise<AppResponse<boolean>> {
+        return {
+            data: req.user ? true : false,
         }
     }
 }
