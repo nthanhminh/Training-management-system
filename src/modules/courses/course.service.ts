@@ -34,7 +34,6 @@ import { CourseWithoutCreatorDto } from './responseDto/courseResponse.dto';
 import { TraineeDto, UpdateStatusTraineeDto } from './dto/trainee.dto';
 import { EUserCourseStatus } from '@modules/user_course/enum/index.enum';
 import { parseDateString } from 'src/helper/date.helper';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { FindMemberOfCourseDto } from './dto/findMember.dto';
 
 @Injectable()
