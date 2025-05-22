@@ -1,3 +1,4 @@
 {
-    "Unauthorized": "You just don't have permission to"
+    "Unauthorized": "You just don't have permission to",
+    "Forbidden Resource": "Forbidden Resource"
 }

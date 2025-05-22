@@ -31,8 +31,8 @@ export class Subject extends BaseEntity {
     @OneToMany(() => Task, (task) => task.subject)
     tasksCreated: Task[];
 
-    @OneToMany(() => CourseSubject, (courseSubject) => courseSubject.course)
-    courseSubjects: CourseSubject;
+    @OneToMany(() => CourseSubject, (courseSubject) => courseSubject.subject)
+    courseSubjects: CourseSubject[];
 
     @CreateDateColumn()
     createdAt: Date;
