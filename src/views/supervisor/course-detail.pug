@@ -1,0 +1,1511 @@
+extends layout
+
+block content
+  // Loading overlay
+  #loadingOverlay
+    .loading-spinner
+      .spinner-border.text-primary(role="status")
+        span.visually-hidden Đang tải...
+
+  .container-fluid.py-4
+    .row
+      .col-12
+        .card.mb-4.shadow-sm
+          .card-body
+            .d-flex.justify-content-between.align-items-center.mb-4
+              h2.mb-0#courseName
+              .d-flex.align-items-center
+                span.badge.bg-primary#courseStatus.me-3
+            .row
+              .col-md-8
+                .mb-4
+                  h5 Mô tả
+                  p#courseDescription
+                .row.mb-4
+                  .col-md-6
+                    h5 Ngày bắt đầu
+                    p#courseStartDate
+                  .col-md-6
+                    h5 Ngày kết thúc
+                    p#courseEndDate
+              .col-md-4
+                img#courseImage.img-fluid.rounded.shadow-sm(src="", alt="Course Image")
+
+    .row.mt-4
+      .col-12
+        .card.shadow-sm
+          .card-header.bg-white
+            ul.nav.nav-tabs.card-header-tabs(role="tablist")
+              li.nav-item(role="presentation")
+                button.nav-link.active#subjects-tab(data-bs-toggle="tab" data-bs-target="#subjects" type="button" role="tab" aria-controls="subjects" aria-selected="true")
+                  i.fas.fa-book-open.me-2
+                  span.text-dark Môn học
+              li.nav-item(role="presentation")
+                button.nav-link#members-tab(data-bs-toggle="tab" data-bs-target="#members" type="button" role="tab" aria-controls="members" aria-selected="false")
+                  i.fas.fa-users.me-2
+                  span.text-dark Thành viên
+              li.nav-item(role="presentation")
+                button.nav-link#supervisors-tab(data-bs-toggle="tab" data-bs-target="#supervisors" type="button" role="tab" aria-controls="supervisors" aria-selected="false")
+                  i.fas.fa-user-shield.me-2
+                  span.text-dark Người giám sát
+          .card-body
+            .tab-content
+              #subjects.tab-pane.fade.show.active(role="tabpanel" aria-labelledby="subjects-tab")
+                .d-flex.justify-content-between.align-items-center.mb-4
+                  h3.mb-0
+                    i.fas.fa-book-open.me-2
+                    | Danh sách môn học
+                  .header-actions
+                    button.btn.btn-primary.btn-sm(data-bs-toggle="modal" data-bs-target="#addSubjectModal")
+                      i.fas.fa-plus.me-2
+                      | Thêm môn học
+                .row#subjectsList
+                  // Dữ liệu môn học sẽ được thêm vào đây
+
+              #members.tab-pane.fade(role="tabpanel" aria-labelledby="members-tab")
+                .d-flex.justify-content-between.align-items-center.mb-4
+                  h3.mb-0
+                    i.fas.fa-users.me-2
+                    | Danh sách thành viên
+                  .header-actions
+                    .d-flex.gap-2
+                      button.btn.btn-primary.btn-sm(data-bs-toggle="modal" data-bs-target="#addMemberModal")
+                        <i class="fas fa-user-plus me-2"></i>
+                        | Thêm thành viên
+                      .input-group
+                        input#memberSearch.form-control(type="text" placeholder="Tìm kiếm thành viên...")
+                        button#searchMember.btn.btn-primary(type="button")
+                          i.fas.fa-search.me-2
+                          | Tìm kiếm
+                .table-responsive
+                  table.table.table-hover
+                    thead
+                      tr
+                        th STT
+                        th Tên thành viên
+                        th Tiến độ
+                        th Ngày đăng ký
+                        th Trạng thái
+                    tbody#membersList
+                      // Dữ liệu thành viên sẽ được thêm vào đây
+                #memberPagination.d-flex.justify-content-center.mt-4
+                  // Phân trang sẽ được thêm vào đây
+
+              #supervisors.tab-pane.fade(role="tabpanel" aria-labelledby="supervisors-tab")
+                .d-flex.justify-content-between.align-items-center.mb-4
+                  h3.mb-0
+                    i.fas.fa-user-shield.me-2
+                    | Danh sách người giám sát
+                  .header-actions
+                    .d-flex.gap-2
+                      button.btn.btn-primary.btn-sm(data-bs-toggle="modal" data-bs-target="#addSupervisorModal")
+                        i.fas.fa-user-plus.me-2
+                        | Thêm người giám sát
+                      .input-group
+                        input#supervisorSearch.form-control(type="text" placeholder="Tìm kiếm người giám sát...")
+                        button#searchSupervisor.btn.btn-primary(type="button")
+                          i.fas.fa-search.me-2
+                          | Tìm kiếm
+                .table-responsive
+                  table.table.table-hover
+                    thead
+                      tr
+                        th STT
+                        th Tên người giám sát
+                        th Email
+                        th Trạng thái
+                        th Thao tác
+                    tbody#supervisorsList
+                      // Dữ liệu người giám sát sẽ được thêm vào đây
+                #supervisorPagination.d-flex.justify-content-center.mt-4
+                  // Phân trang sẽ được thêm vào đây
+
+  // Toast container
+  .toast-container.position-fixed.top-0.end-0.p-3
+    #notificationToast.toast(role="alert" aria-live="assertive" aria-atomic="true")
+      .toast-header
+        i.fas.fa-info-circle.me-2
+        strong.me-auto#toastTitle Thông báo
+        button.btn-close(type="button" data-bs-dismiss="toast" aria-label="Close")
+      .toast-body#toastMessage
+
+  // Modal chỉnh sửa khóa học
+  #editCourseModal.modal.fade(tabindex="-1")
+    .modal-dialog.modal-lg
+      .modal-content
+        .modal-header
+          h5.modal-title
+            i.fas.fa-edit.me-2
+            | Chỉnh sửa khóa học
+          button.btn-close(type="button" data-bs-dismiss="modal")
+        .modal-body
+          form#editCourseForm
+            .mb-3
+              label.form-label(for="editName") Tên khóa học
+              input#editName.form-control(type="text" name="name" required)
+            .mb-3
+              label.form-label(for="editDescription") Mô tả
+              textarea#editDescription.form-control(name="description" rows="3" required)
+            .row.mb-3
+              .col-md-6
+                label.form-label(for="editStartDate") Ngày bắt đầu
+                input#editStartDate.form-control(type="date" name="startDate" required)
+              .col-md-6
+                label.form-label(for="editEndDate") Ngày kết thúc
+                input#editEndDate.form-control(type="date" name="endDate" required)
+            .mb-3
+              label.form-label(for="editStatus") Trạng thái
+              select#editStatus.form-select(name="status" required)
+                option(value="DISABLED") Không hoạt động
+                option(value="ACTIVE") Đang hoạt động
+        .modal-footer
+          button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Hủy
+          button.btn.btn-primary(type="submit") Lưu thay đổi
+
+  // Modal thêm môn học
+  #addSubjectModal.modal.fade(tabindex="-1")
+    .modal-dialog.modal-lg
+      .modal-content
+        .modal-header.bg-primary.text-white
+          h5.modal-title
+            i.fas.fa-book-medical.me-2
+            | Thêm môn học
+          button.btn-close.btn-close-white(type="button" data-bs-dismiss="modal")
+        .modal-body
+          .mb-4
+            .input-group.input-group-lg
+              input#subjectSearch.form-control(type="text" placeholder="Nhập tên môn học để tìm kiếm...")
+              button#searchSubject.btn.btn-primary(type="button")
+                i.fas.fa-search.me-2
+                | Tìm kiếm
+          .mb-4
+            .d-flex.align-items-center.mb-2
+              i.fas.fa-check-circle.text-success.me-2
+              h6.mb-0 Đã chọn: 
+                span#selectedCount.badge.bg-success.ms-2 0 môn học
+            #selectedSubjects.list-group.mb-3
+          .mb-4
+            .d-flex.align-items-center.mb-2
+              i.fas.fa-search.text-primary.me-2
+              h6.mb-0 Kết quả tìm kiếm:
+            #subjectSearchResults.list-group.mb-3
+            #subjectPagination.d-flex.justify-content-center
+        .modal-footer.bg-light
+          button.btn.btn-secondary(type="button" data-bs-dismiss="modal")
+            i.fas.fa-times.me-2
+            | Hủy
+          button#addSubjectsBtn.btn.btn-primary(type="button")
+            i.fas.fa-plus.me-2
+            | Thêm môn học
+
+  // Modal thêm thành viên
+  #addMemberModal.modal.fade(tabindex="-1")
+    .modal-dialog
+      .modal-content
+        .modal-header
+          h5.modal-title
+            i.fas.fa-user-plus.me-2
+            | Thêm thành viên
+          button.btn-close(type="button" data-bs-dismiss="modal")
+        .modal-body
+          form#addMemberForm
+            .mb-3
+              label.form-label(for="memberEmails") Email thành viên
+              textarea#memberEmails.form-control(
+                rows="5" 
+                placeholder="Nhập email thành viên, mỗi email một dòng"
+                required
+              )
+              .form-text.text-muted
+                | Nhập email của thành viên cần thêm, mỗi email một dòng
+        .modal-footer
+          button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Hủy
+          button.btn.btn-primary(type="submit", form="addMemberForm") Thêm thành viên
+
+  // Modal thêm người giám sát
+  #addSupervisorModal.modal.fade(tabindex="-1")
+    .modal-dialog
+      .modal-content
+        .modal-header
+          h5.modal-title
+            i.fas.fa-user-shield.me-2
+            | Thêm người giám sát
+          button.btn-close(type="button" data-bs-dismiss="modal")
+        .modal-body
+          form#addSupervisorForm
+            .mb-3
+              label.form-label(for="supervisorEmail") Email người giám sát
+              input#supervisorEmail.form-control(
+                type="email"
+                placeholder="Nhập email người giám sát"
+                required
+              )
+              .form-text.text-muted
+                | Nhập email của người giám sát cần thêm
+        .modal-footer
+          button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Hủy
+          button.btn.btn-primary(type="submit", form="addSupervisorForm") Thêm người giám sát
+
+  style.
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .loading-spinner {
+      text-align: center;
+    }
+    .spinner-border {
+      width: 3rem;
+      height: 3rem;
+    }
+    .card {
+      transition: all 0.3s ease;
+      border: none;
+      border-radius: 15px;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card-header {
+      border-bottom: 2px solid #f8f9fa;
+      border-radius: 15px 15px 0 0 !important;
+    }
+    .subject-card {
+      border: none;
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      background: white;
+      transition: all 0.3s ease;
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+      cursor: pointer;
+    }
+    .subject-card:hover {
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      transform: translateY(-3px);
+    }
+    .subject-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f8f9fa;
+    }
+    .subject-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin: 0;
+    }
+    .subject-description {
+      color: #6c757d;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .tasks-section {
+      margin-top: 1.5rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .tasks-section.show {
+      max-height: 1000px;
+    }
+    .tasks-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .tasks-header i {
+      color: #0d6efd;
+      margin-right: 0.5rem;
+      transition: transform 0.3s ease;
+    }
+    .subject-card.expanded .tasks-header i {
+      transform: rotate(180deg);
+    }
+    .task-item {
+      padding: 1rem;
+      margin: 0.75rem 0;
+      border-radius: 10px;
+      background: #f8f9fa;
+      transition: all 0.3s ease;
+      border: 1px solid #e9ecef;
+    }
+    .task-item:hover {
+      background: #e9ecef;
+      transform: translateX(5px);
+      border-color: #0d6efd;
+    }
+    .task-title {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+    }
+    .task-link {
+      display: inline-flex;
+      align-items: center;
+      color: #0d6efd;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+    .task-link:hover {
+      color: #0a58ca;
+    }
+    .task-link i {
+      margin-right: 0.5rem;
+    }
+    .badge {
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+    }
+    #courseImage {
+      max-height: 300px;
+      object-fit: cover;
+      width: 100%;
+      border-radius: 15px;
+    }
+    .no-tasks {
+      text-align: center;
+      padding: 2rem;
+      background: #f8f9fa;
+      border-radius: 10px;
+      color: #6c757d;
+    }
+    .no-tasks i {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #dee2e6;
+    }
+    .modal-content {
+      border: none;
+      border-radius: 15px;
+    }
+    .modal-header {
+      border-bottom: 2px solid #f8f9fa;
+      border-radius: 15px 15px 0 0;
+    }
+    .modal-footer {
+      border-top: 2px solid #f8f9fa;
+      border-radius: 0 0 15px 15px;
+    }
+    .form-control, .form-select {
+      border-radius: 8px;
+      border: 1px solid #dee2e6;
+      padding: 0.75rem;
+      transition: all 0.3s ease;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    .form-label {
+      font-weight: 500;
+      color: #2c3e50;
+    }
+    .form-check-input {
+      width: 3em;
+      height: 1.5em;
+      margin-top: 0.25em;
+      vertical-align: top;
+      background-color: #fff;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      border: 1px solid rgba(0, 0, 0, 0.25);
+      appearance: none;
+      color-adjust: exact;
+      print-color-adjust: exact;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .form-check-input:checked {
+      background-color: #198754;
+      border-color: #198754;
+      box-shadow: 0 0 10px rgba(25, 135, 84, 0.5);
+    }
+    .form-check-input:disabled {
+      opacity: 1;
+      cursor: not-allowed;
+    }
+    .form-check-input:checked:disabled {
+      background-color: #198754;
+      border-color: #198754;
+      box-shadow: 0 0 15px rgba(25, 135, 84, 0.7);
+    }
+    .form-check-label {
+      margin-left: 0.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    .form-check-input:checked + .form-check-label {
+      color: #198754;
+      font-weight: 600;
+    }
+
+    /* Toast styles */
+    .toast-container {
+      z-index: 9999;
+    }
+    .toast {
+      background: white;
+      border: none;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      border-radius: 15px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease-in-out;
+    }
+    .toast.show {
+      transform: translateX(0);
+    }
+    .toast-header {
+      border-bottom: 2px solid #f8f9fa;
+      border-radius: 15px 15px 0 0;
+      padding: 1rem;
+    }
+    .toast-body {
+      padding: 1rem;
+      font-size: 0.95rem;
+    }
+    .toast.success .toast-header {
+      background-color: #198754;
+      color: white;
+    }
+    .toast.error .toast-header {
+      background-color: #dc3545;
+      color: white;
+    }
+    .toast.warning .toast-header {
+      background-color: #ffc107;
+      color: #000;
+    }
+    .toast.info .toast-header {
+      background-color: #0dcaf0;
+      color: white;
+    }
+    .toast.success .toast-body {
+      border-left: 4px solid #198754;
+    }
+    .toast.error .toast-body {
+      border-left: 4px solid #dc3545;
+    }
+    .toast.warning .toast-body {
+      border-left: 4px solid #ffc107;
+    }
+    .toast.info .toast-body {
+      border-left: 4px solid #0dcaf0;
+    }
+
+    /* Modal styles */
+    .modal-content {
+      border: none;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    .modal-header {
+      padding: 1.5rem;
+    }
+    .modal-body {
+      padding: 2rem;
+    }
+    .modal-footer {
+      padding: 1.5rem;
+    }
+    .input-group-lg > .form-control {
+      padding: 1rem 1.25rem;
+      font-size: 1.1rem;
+    }
+    .list-group-item {
+      border: 1px solid #e9ecef;
+      margin-bottom: 0.5rem;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+    .list-group-item:hover {
+      transform: translateX(5px);
+      border-color: #0d6efd;
+      box-shadow: 0 0.125rem 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    .badge {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    .pagination {
+      margin-top: 1.5rem;
+    }
+    .page-link {
+      padding: 0.75rem 1rem;
+      margin: 0 0.25rem;
+      border-radius: 8px;
+      border: none;
+      color: #0d6efd;
+      transition: all 0.3s ease;
+    }
+    .page-link:hover {
+      background-color: #e9ecef;
+      transform: translateY(-2px);
+    }
+    .page-item.active .page-link {
+      background-color: #0d6efd;
+      color: white;
+      box-shadow: 0 0.125rem 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    /* Tab styles */
+    .nav-tabs {
+      border-bottom: 2px solid #f8f9fa;
+    }
+    .nav-tabs .nav-link {
+      border: none;
+      color: #333;
+      padding: 1rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+    }
+    .nav-tabs .nav-link i {
+      margin-right: 0.5rem;
+    }
+    .nav-tabs .nav-link:hover {
+      color: #0d6efd;
+      border: none;
+    }
+    .nav-tabs .nav-link.active {
+      color: #0d6efd;
+      border: none;
+      border-bottom: 2px solid #0d6efd;
+      background: none;
+    }
+    .nav-tabs .nav-link span {
+      color: #333;
+    }
+    .nav-tabs .nav-link.active span {
+      color: #0d6efd;
+    }
+    .tab-content {
+      padding: 1.5rem 0;
+    }
+    
+    /* Table styles */
+    .table {
+      margin-bottom: 0;
+    }
+    .table th {
+      font-weight: 600;
+      color: #2c3e50;
+      border-top: none;
+    }
+    .table td {
+      vertical-align: middle;
+    }
+    .progress {
+      height: 0.5rem;
+      border-radius: 1rem;
+    }
+    .badge {
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+    }
+
+  script.
+    // Các biến toàn cục
+    let currentCourse = null;
+    let selectedSubjects = new Set();
+    let currentSubjectPage = 1;
+    const subjectPageSize = 2;
+    let currentMemberPage = 1;
+    const memberPageSize = 10;
+    let currentMemberSearch = '';
+
+    // Xử lý tab người giám sát
+    let currentSupervisorPage = 1;
+    const pageSize = 10;
+    let supervisorSearchTerm = '';
+
+    // Các hàm tiện ích
+    function showLoading() {
+      document.getElementById('loadingOverlay').style.display = 'flex';
+    }
+
+    function hideLoading() {
+      document.getElementById('loadingOverlay').style.display = 'none';
+    }
+
+    function formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString('vi-VN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    function showNotification(type, title, message) {
+      const toast = document.getElementById('notificationToast');
+      const toastTitle = document.getElementById('toastTitle');
+      const toastMessage = document.getElementById('toastMessage');
+      
+      // Reset classes
+      toast.className = 'toast';
+      toast.classList.add(type);
+      
+      // Set content
+      toastTitle.textContent = title;
+      toastMessage.textContent = message;
+      
+      // Show toast with slide animation
+      const bsToast = new bootstrap.Toast(toast, {
+        animation: true,
+        autohide: true,
+        delay: 3000
+      });
+      
+      // Add slide-in animation
+      toast.style.transform = 'translateX(100%)';
+      bsToast.show();
+      setTimeout(() => {
+        toast.style.transform = 'translateX(0)';
+      }, 100);
+      
+      // Add slide-out animation before hiding
+      toast.addEventListener('hide.bs.toast', () => {
+        toast.style.transform = 'translateX(100%)';
+      });
+    }
+
+    function updateSelectedCount() {
+      const count = selectedSubjects.size;
+      document.getElementById('selectedCount').textContent = `${count} môn học`;
+    }
+
+    // Hàm xử lý môn học
+    function addSubject(subjectId, subjectName) {
+      selectedSubjects.add(subjectId);
+      const selectedContainer = document.getElementById('selectedSubjects');
+      
+      const subjectElement = document.createElement('div');
+      subjectElement.className = 'list-group-item d-flex justify-content-between align-items-center';
+      subjectElement.innerHTML = `
+        <div>
+          <h6 class="mb-0">${subjectName}</h6>
+        </div>
+        <button class="btn btn-sm btn-outline-danger remove-subject" data-id="${subjectId}">
+          <i class="fas fa-times me-1"></i>
+          Xóa
+        </button>
+      `;
+
+      selectedContainer.appendChild(subjectElement);
+      updateSelectedCount();
+
+      subjectElement.querySelector('.remove-subject').addEventListener('click', () => {
+        selectedSubjects.delete(subjectId);
+        subjectElement.remove();
+        updateSelectedCount();
+        const addButton = document.querySelector(`.add-subject[data-id="${subjectId}"]`);
+        if (addButton) {
+          addButton.disabled = false;
+          addButton.innerHTML = '<i class="fas fa-plus me-1"></i>Thêm';
+        }
+      });
+    }
+
+    // Hàm tìm kiếm và phân trang
+    async function searchSubjects(page = 1, searchTerm = '') {
+      try {
+        showLoading();
+        const url = searchTerm 
+          ? `/subjects/list?page=${page}&pageSize=${subjectPageSize}&name=${encodeURIComponent(searchTerm)}`
+          : `/subjects/list?page=${page}&pageSize=${subjectPageSize}`;
+        
+        console.log('Debug - Fetching Subjects URL:', url);
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.statusCode === 200) {
+          const resultsContainer = document.getElementById('subjectSearchResults');
+          const subjects = data.data.items;
+          const totalItems = data.data.count;
+          const totalPages = Math.ceil(totalItems / subjectPageSize);
+          
+          console.log('Debug - Subjects Data:', {
+            currentPage: page,
+            totalPages: totalPages,
+            totalItems: totalItems,
+            itemsPerPage: subjectPageSize,
+            subjects: subjects
+          });
+
+          if (subjects.length === 0) {
+            resultsContainer.innerHTML = `
+              <div class="alert alert-info d-flex align-items-center">
+                <i class="fas fa-info-circle me-2"></i>
+                Không tìm thấy môn học nào
+              </div>`;
+            document.getElementById('subjectPagination').innerHTML = '';
+            return;
+          }
+
+          resultsContainer.innerHTML = subjects.map(subject => `
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="mb-1">${subject.name}</h6>
+                <small class="text-muted">${subject.description || 'Không có mô tả'}</small>
+              </div>
+              <button class="btn btn-sm btn-outline-primary add-subject" 
+                      data-id="${subject.id}" 
+                      data-name="${subject.name}"
+                      ${selectedSubjects.has(subject.id) ? 'disabled' : ''}>
+                <i class="fas ${selectedSubjects.has(subject.id) ? 'fa-check' : 'fa-plus'} me-1"></i>
+                ${selectedSubjects.has(subject.id) ? 'Đã chọn' : 'Thêm'}
+              </button>
+            </div>
+          `).join('');
+
+          renderSubjectsPagination(page, totalPages, searchTerm);
+
+          document.querySelectorAll('.add-subject').forEach(button => {
+            button.addEventListener('click', () => {
+              const subjectId = button.dataset.id;
+              const subjectName = button.dataset.name;
+              addSubject(subjectId, subjectName);
+              button.disabled = true;
+              button.innerHTML = '<i class="fas fa-check me-1"></i>Đã chọn';
+            });
+          });
+        } else {
+          throw new Error(data.message || 'Không thể tải danh sách môn học');
+        }
+      } catch (error) {
+        console.error('Error searching subjects:', error);
+        showNotification('error', 'Lỗi', 'Không thể tìm kiếm môn học');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function renderSubjectsPagination(currentPage, totalPages, searchTerm) {
+      console.log('Debug - Render Subjects Pagination:', {
+        currentPage,
+        totalPages,
+        searchTerm,
+        subjectPageSize
+      });
+
+      const paginationContainer = document.getElementById('subjectPagination');
+      
+      let paginationHTML = '<ul class="pagination">';
+      
+      for (let i = 1; i <= totalPages; i++) {
+        paginationHTML += `
+          <li class="page-item ${i === currentPage ? 'active' : ''}">
+            <a class="page-link" href="#" data-page="${i}">${i}</a>
+          </li>
+        `;
+      }
+      
+      paginationHTML += '</ul>';
+      paginationContainer.innerHTML = paginationHTML;
+      
+      paginationContainer.querySelectorAll('.page-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const page = parseInt(link.dataset.page);
+          if (!isNaN(page) && page > 0 && page <= totalPages) {
+            console.log('Debug - Subject page clicked:', page);
+            currentSubjectPage = page;
+            searchSubjects(page, searchTerm);
+          }
+        });
+      });
+    }
+
+    // Hàm xử lý khóa học
+    async function fetchCourseDetail() {
+      showLoading();
+      try {
+        const pathParts = window.location.pathname.split('/');
+        const courseId = pathParts[pathParts.length - 1];
+        
+        if (!courseId) {
+          throw new Error('Không tìm thấy ID khóa học');
+        }
+        
+        const response = await fetch(`/courses/supervisor/detail?courseId=${courseId}`);
+        const result = await response.json();
+        
+        if (result.statusCode === 200 && result.data) {
+          currentCourse = result.data;
+          
+          document.getElementById('courseName').textContent = currentCourse.name;
+          document.getElementById('courseStatus').textContent = 
+            currentCourse.status === 'ACTIVE' ? 'Đang hoạt động' : 'Không hoạt động';
+          document.getElementById('courseStatus').className = 
+            `badge ${currentCourse.status === 'ACTIVE' ? 'bg-success' : 'bg-warning'} me-3`;
+          document.getElementById('courseDescription').textContent = currentCourse.description;
+          document.getElementById('courseStartDate').textContent = formatDate(currentCourse.startDate);
+          document.getElementById('courseEndDate').textContent = formatDate(currentCourse.endDate);
+          document.getElementById('courseImage').src = currentCourse.image;
+          
+          renderSubjects(currentCourse.courseSubjects);
+        } else {
+          throw new Error(result.message || 'Không thể tải thông tin khóa học');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('error', 'Lỗi', error.message || 'Có lỗi xảy ra khi tải thông tin khóa học');
+        setTimeout(() => {
+          window.location.href = '/views/supervisor/courses';
+        }, 2000);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function renderSubjects(subjects) {
+      const subjectsList = document.getElementById('subjectsList');
+      subjectsList.innerHTML = '';
+
+      subjects.forEach(courseSubject => {
+        if (courseSubject.subject) {
+          const subjectCard = document.createElement('div');
+          subjectCard.className = 'col-md-6 col-lg-4 mb-4';
+          subjectCard.innerHTML = `
+            <div class="subject-card">
+              <div class="subject-header">
+                <h4 class="subject-title">${courseSubject.subject.name}</h4>
+                <div class="d-flex align-items-center">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input status-toggle" type="checkbox" 
+                           role="switch" 
+                           id="status-${courseSubject.id}"
+                           data-id="${courseSubject.id}"
+                           ${courseSubject.status === 'FINISH' ? 'checked disabled' : ''}>
+                    <label class="form-check-label" for="status-${courseSubject.id}">
+                      ${courseSubject.status === 'FINISH' ? 'Hoàn thành' : 'Đang thực hiện'}
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <p class="subject-description">${courseSubject.subject.description || 'Không có mô tả'}</p>
+              
+              <div class="tasks-section">
+                <div class="tasks-header">
+                  <i class="fas fa-chevron-down"></i>
+                  <h5 class="mb-0">Nhiệm vụ (${courseSubject.subject.tasksCreated.length})</h5>
+                </div>
+                
+                ${courseSubject.subject.tasksCreated.length > 0 ? `
+                  <div class="tasks-list">
+                    ${courseSubject.subject.tasksCreated.map(task => `
+                      <div class="task-item">
+                        <h6 class="task-title">${task.title}</h6>
+                        <a href="${task.contentFileLink}" target="_blank" class="task-link">
+                          <i class="fas fa-play-circle"></i>
+                          Xem video bài giảng
+                        </a>
+                      </div>
+                    `).join('')}
+                  </div>
+                ` : `
+                  <div class="no-tasks">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>Chưa có nhiệm vụ nào</p>
+                  </div>
+                `}
+              </div>
+            </div>
+          `;
+          subjectsList.appendChild(subjectCard);
+
+          // Thêm sự kiện click cho toàn bộ subject card
+          const card = subjectCard.querySelector('.subject-card');
+          const tasksSection = card.querySelector('.tasks-section');
+          
+          card.addEventListener('click', (e) => {
+            // Ngăn chặn sự kiện click khi click vào checkbox status
+            if (e.target.closest('.status-toggle')) {
+              return;
+            }
+            
+            // Toggle class expanded cho card
+            card.classList.toggle('expanded');
+            
+            // Toggle class show cho tasks section
+            tasksSection.classList.toggle('show');
+            
+            // Log để debug
+            console.log('Card clicked:', {
+              isExpanded: card.classList.contains('expanded'),
+              isShow: tasksSection.classList.contains('show'),
+              tasksCount: courseSubject.subject.tasksCreated.length
+            });
+          });
+        }
+      });
+
+      // Thêm sự kiện cho status toggle
+      document.querySelectorAll('.status-toggle').forEach(checkbox => {
+        checkbox.addEventListener('change', async function() {
+          const label = this.nextElementSibling;
+          
+          if (this.checked) {
+            label.textContent = 'Hoàn thành';
+            label.style.color = '#198754';
+            label.style.fontWeight = '600';
+            
+            if (confirm('Bạn có chắc chắn muốn đánh dấu môn học này đã hoàn thành?')) {
+              try {
+                showLoading();
+                const response = await fetch(`/course_subject/${this.dataset.id}`, {
+                  method: 'PATCH',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    status: 'FINISH'
+                  })
+                });
+
+                const data = await response.json();
+                
+                if (data.statusCode === 200 || data.statusCode === 201) {
+                  showNotification('success', 'Thành công', 'Cập nhật trạng thái môn học thành công');
+                  this.disabled = true;
+                } else {
+                  this.checked = false;
+                  label.textContent = 'Đang thực hiện';
+                  label.style.color = '';
+                  label.style.fontWeight = '';
+                  throw new Error(data.message || 'Không thể cập nhật trạng thái môn học');
+                }
+              } catch (error) {
+                console.error('Error:', error);
+                showNotification('error', 'Lỗi', error.message || 'Có lỗi xảy ra khi cập nhật trạng thái môn học');
+              } finally {
+                hideLoading();
+              }
+            } else {
+              this.checked = false;
+              label.textContent = 'Đang thực hiện';
+              label.style.color = '';
+              label.style.fontWeight = '';
+            }
+          }
+        });
+      });
+    }
+
+    // Event listeners
+    document.getElementById('searchSubject').addEventListener('click', () => {
+      const searchTerm = document.getElementById('subjectSearch').value.trim();
+      currentSubjectPage = 1;
+      console.log('Debug - Subject Search clicked:', { searchTerm, currentSubjectPage });
+      searchSubjects(currentSubjectPage, searchTerm);
+    });
+
+    document.getElementById('subjectSearch').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const searchTerm = e.target.value.trim();
+        currentSubjectPage = 1;
+        console.log('Debug - Subject Search Enter:', { searchTerm, currentSubjectPage });
+        searchSubjects(currentSubjectPage, searchTerm);
+      }
+    });
+
+    document.getElementById('addSubjectModal').addEventListener('show.bs.modal', () => {
+      currentSubjectPage = 1;
+      selectedSubjects.clear();
+      document.getElementById('selectedSubjects').innerHTML = '';
+      updateSelectedCount();
+      console.log('Debug - Modal opened');
+      searchSubjects(currentSubjectPage, '');
+    });
+
+    document.getElementById('addSubjectsBtn').addEventListener('click', async () => {
+      if (selectedSubjects.size === 0) {
+        showNotification('error', 'Lỗi', 'Vui lòng chọn ít nhất một môn học');
+        return;
+      }
+
+      try {
+        showLoading();
+        const pathParts = window.location.pathname.split('/');
+        const courseId = pathParts[pathParts.length - 1];
+        
+        const response = await fetch(`/courses/subject/${courseId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            subjectIds: Array.from(selectedSubjects)
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.statusCode === 200 || data.statusCode === 201) {
+          showNotification('success', 'Thành công', 'Thêm môn học thành công');
+          bootstrap.Modal.getInstance(document.getElementById('addSubjectModal')).hide();
+          window.location.reload();
+        } else {
+          throw new Error(data.message || 'Không thể thêm môn học');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('error', 'Lỗi', error.message || 'Có lỗi xảy ra khi thêm môn học');
+      } finally {
+        hideLoading();
+      }
+    });
+
+    // Hàm xử lý thành viên
+    async function fetchMembers(page = 1, search = '') {
+      try {
+        showLoading();
+        const pathParts = window.location.pathname.split('/');
+        const courseId = pathParts[pathParts.length - 1];
+        
+        const url = `/courses/supervisor/members?page=${page}&pageSize=${memberPageSize}&courseId=${courseId}${search ? `&search=${encodeURIComponent(search)}` : ''}`;
+        
+        const response = await fetch(url);
+        const result = await response.json();
+        
+        if (result.statusCode === 200) {
+          const members = result.data.items;
+          const totalItems = result.data.count;
+          const totalPages = Math.ceil(totalItems / memberPageSize);
+          
+          renderMembers(members);
+          renderMemberPagination(page, totalPages, search);
+        } else {
+          throw new Error(result.message || 'Không thể tải danh sách thành viên');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('error', 'Lỗi', error.message || 'Có lỗi xảy ra khi tải danh sách thành viên');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function renderMembers(members) {
+      const membersList = document.getElementById('membersList');
+      membersList.innerHTML = '';
+
+      if (members.length === 0) {
+        membersList.innerHTML = `
+          <tr>
+            <td colspan="5" class="text-center py-4">
+              <i class="fas fa-users fa-2x text-muted mb-3"></i>
+              <p class="mb-0">Không có thành viên nào</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      members.forEach((member, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${(currentMemberPage - 1) * memberPageSize + index + 1}</td>
+          <td>
+            <div class="d-flex align-items-center">
+              <div>
+                <h6 class="mb-0">${member.user.name}</h6>
+                <small class="text-muted">${member.user.email}</small>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="progress">
+              <div class="progress-bar bg-success" role="progressbar" 
+                   style="width: ${member.courseProgress}%" 
+                   aria-valuenow="${member.courseProgress}" 
+                   aria-valuemin="0" 
+                   aria-valuemax="100">
+                ${member.courseProgress}%
+              </div>
+            </div>
+          </td>
+          <td>${formatDate(member.enrollDate)}</td>
+          <td>
+            <select class="form-select form-select-sm status-select" 
+                    data-id="${member.id}" 
+                    style="width: 150px;">
+              <option value="IN_PROGRESS" ${member.status === 'IN_PROGRESS' ? 'selected' : ''}>Đang học</option>
+              <option value="PASS" ${member.status === 'PASS' ? 'selected' : ''}>Đạt</option>
+              <option value="FAIL" ${member.status === 'FAIL' ? 'selected' : ''}>Không đạt</option>
+              <option value="RESIGN" ${member.status === 'RESIGN' ? 'selected' : ''}>Đã rời khóa học</option>
+              <option value="INACTIVE" ${member.status === 'INACTIVE' ? 'selected' : ''}>Không hoạt động</option>
+            </select>
+          </td>
+        `;
+        membersList.appendChild(row);
+
+        // Thêm sự kiện thay đổi trạng thái
+        const statusSelect = row.querySelector('.status-select');
+        statusSelect.addEventListener('change', async function() {
+          if (confirm('Bạn có chắc chắn muốn thay đổi trạng thái của thành viên này?')) {
+            try {
+              showLoading();
+              const response = await fetch(`/courses/supervisor/trainee/${this.dataset.id}`, {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  status: this.value
+                })
+              });
+
+              const data = await response.json();
+              
+              if (data.statusCode === 200 || data.statusCode === 201) {
+                showNotification('success', 'Thành công', 'Cập nhật trạng thái thành viên thành công');
+              } else {
+                throw new Error(data.message || 'Không thể cập nhật trạng thái thành viên');
+              }
+            } catch (error) {
+              console.error('Error:', error);
+              showNotification('error', 'Lỗi', error.message || 'Có lỗi xảy ra khi cập nhật trạng thái thành viên');
+              this.value = member.status;
+            } finally {
+              hideLoading();
+            }
+          } else {
+            this.value = member.status;
+          }
+        });
+      });
+    }
+
+    function renderMemberPagination(currentPage, totalPages, search) {
+      const paginationContainer = document.getElementById('memberPagination');
+      
+      if (totalPages <= 1) {
+        paginationContainer.innerHTML = '';
+        return;
+      }
+      
+      let paginationHTML = '<ul class="pagination">';
+      
+      // Previous button
+      paginationHTML += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+          <a class="page-link" href="#" data-page="${currentPage - 1}">
+            <i class="fas fa-chevron-left"></i>
+          </a>
+        </li>
+      `;
+      
+      // Page numbers
+      for (let i = 1; i <= totalPages; i++) {
+        paginationHTML += `
+          <li class="page-item ${i === currentPage ? 'active' : ''}">
+            <a class="page-link" href="#" data-page="${i}">${i}</a>
+          </li>
+        `;
+      }
+      
+      // Next button
+      paginationHTML += `
+        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+          <a class="page-link" href="#" data-page="${currentPage + 1}">
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </li>
+      `;
+      
+      paginationHTML += '</ul>';
+      paginationContainer.innerHTML = paginationHTML;
+      
+      // Add click event listeners
+      paginationContainer.querySelectorAll('.page-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const page = parseInt(link.dataset.page);
+          if (!isNaN(page) && page > 0 && page <= totalPages) {
+            currentMemberPage = page;
+            fetchMembers(page, search);
+          }
+        });
+      });
+    }
+
+    document.getElementById('searchMember').addEventListener('click', () => {
+      currentMemberSearch = document.getElementById('memberSearch').value.trim();
+      currentMemberPage = 1;
+      fetchMembers(currentMemberPage, currentMemberSearch);
+    });
+
+    document.getElementById('memberSearch').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        currentMemberSearch = e.target.value.trim();
+        currentMemberPage = 1;
+        fetchMembers(currentMemberPage, currentMemberSearch);
+      }
+    });
+
+    document.getElementById('members-tab').addEventListener('shown.bs.tab', () => {
+      fetchMembers(currentMemberPage, currentMemberSearch);
+    });
+
+    document.getElementById('addMemberForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const emails = document.getElementById('memberEmails').value
+        .split('\n')
+        .map(email => email.trim())
+        .filter(email => email !== '');
+
+      if (emails.length === 0) {
+        showNotification('error', 'Lỗi', 'Vui lòng nhập ít nhất một email');
+        return;
+      }
+
+      try {
+        showLoading();
+        const pathParts = window.location.pathname.split('/');
+        const courseId = pathParts[pathParts.length - 1];
+
+        const response = await fetch('/courses/supervisor/trainee', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            emails: emails,
+            courseId: courseId
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.statusCode === 200 || data.statusCode === 201) {
+          showNotification('success', 'Thành công', 'Thêm thành viên thành công');
+          bootstrap.Modal.getInstance(document.getElementById('addMemberModal')).hide();
+          document.getElementById('addMemberForm').reset();
+          fetchMembers(currentMemberPage, currentMemberSearch);
+        } else {
+          throw new Error(data.message || 'Không thể thêm thành viên');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('error', 'Lỗi', error.message || 'Có lỗi xảy ra khi thêm thành viên');
+      } finally {
+        hideLoading();
+      }
+    });
+
+    document.getElementById('addMemberModal').addEventListener('hidden.bs.modal', function () {
+      document.getElementById('addMemberForm').reset();
+    });
+
+    async function loadSupervisors(page = 1, search = '') {
+      try {
+        showLoading();
+        const pathParts = window.location.pathname.split('/');
+        const courseId = pathParts[pathParts.length - 1];
+
+        const response = await fetch(`/supervisor_course/?page=${page}&pageSize=${pageSize}&search=${search}&courseId=${courseId}`);
+        const result = await response.json();
+
+        if (result.statusCode === 200) {
+          const supervisorsList = document.getElementById('supervisorsList');
+          supervisorsList.innerHTML = '';
+          
+          if (result.data.items.length === 0) {
+            supervisorsList.innerHTML = `
+              <tr>
+                <td colspan="5" class="text-center py-4">
+                  <i class="fas fa-user-shield fa-2x text-muted mb-3"></i>
+                  <p class="mb-0">Không có người giám sát nào</p>
+                </td>
+              </tr>
+            `;
+            return;
+          }
+
+          result.data.items.forEach((item, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${(page - 1) * pageSize + index + 1}</td>
+              <td>${item.user.name}</td>
+              <td>${item.user.email}</td>
+              <td>
+                <span class="badge ${item.user.status === 'ACTIVE' ? 'bg-success' : 'bg-danger'}">
+                  ${item.user.status === 'ACTIVE' ? 'Hoạt động' : 'Không hoạt động'}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-danger btn-sm" onclick="removeSupervisor('${item.id}')">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            `;
+            supervisorsList.appendChild(row);
+          });
+
+          updateSupervisorPagination(result.data.count, page);
+        } else {
+          throw new Error(result.message || 'Không thể tải danh sách người giám sát');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('error', 'Lỗi', error.message || 'Có lỗi xảy ra khi tải danh sách người giám sát');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function updateSupervisorPagination(totalItems, currentPage) {
+      const totalPages = Math.ceil(totalItems / pageSize);
+      const pagination = document.getElementById('supervisorPagination');
+      pagination.innerHTML = '';
+
+      if (totalPages <= 1) return;
+
+      let paginationHTML = '<ul class="pagination">';
+      
+      paginationHTML += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+          <a class="page-link" href="#" data-page="${currentPage - 1}">
+            <i class="fas fa-chevron-left"></i>
+          </a>
+        </li>
+      `;
+      
+      for (let i = 1; i <= totalPages; i++) {
+        paginationHTML += `
+          <li class="page-item ${i === currentPage ? 'active' : ''}">
+            <a class="page-link" href="#" data-page="${i}">${i}</a>
+          </li>
+        `;
+      }
+      
+      paginationHTML += `
+        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+          <a class="page-link" href="#" data-page="${currentPage + 1}">
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </li>
+      `;
+      
+      paginationHTML += '</ul>';
+      pagination.innerHTML = paginationHTML;
+      
+      pagination.querySelectorAll('.page-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const page = parseInt(link.dataset.page);
+          if (!isNaN(page) && page > 0 && page <= totalPages) {
+            currentSupervisorPage = page;
+            loadSupervisors(page, supervisorSearchTerm);
+          }
+        });
+      });
+    }
+
+    document.getElementById('searchSupervisor').addEventListener('click', () => {
+      supervisorSearchTerm = document.getElementById('supervisorSearch').value.trim();
+      currentSupervisorPage = 1;
+      loadSupervisors(currentSupervisorPage, supervisorSearchTerm);
+    });
+
+    document.getElementById('supervisorSearch').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        supervisorSearchTerm = e.target.value.trim();
+        currentSupervisorPage = 1;
+        loadSupervisors(currentSupervisorPage, supervisorSearchTerm);
+      }
+    });
+
+    document.getElementById('addSupervisorForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        showLoading();
+        const pathParts = window.location.pathname.split('/');
+        const email = document.getElementById('supervisorEmail').value.trim();
+        const courseId = pathParts[pathParts.length - 1];
+
+        const response = await fetch(`/courses/supervisor/${courseId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        const result = await response.json();
+
+        if (result.statusCode === 200 || result.statusCode === 201) {
+          showNotification('success', 'Thành công', 'Thêm người giám sát thành công');
+          document.getElementById('addSupervisorForm').reset();
+          const modal = bootstrap.Modal.getInstance(document.getElementById('addSupervisorModal'));
+          modal.hide();
+          loadSupervisors(currentSupervisorPage, supervisorSearchTerm);
+        } else {
+          throw new Error(result.message || 'Không thể thêm người giám sát');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('error', 'Lỗi', error.message || 'Có lỗi xảy ra khi thêm người giám sát');
+      } finally {
+        hideLoading();
+      }
+    });
+
+    async function removeSupervisor(supervisorId) {
+      if (!confirm('Bạn có chắc chắn muốn xóa người giám sát này?')) return;
+
+      try {
+        showLoading();
+        const response = await fetch(`/supervisor_course/${supervisorId}`, {
+          method: 'DELETE'
+        });
+
+        const result = await response.json();
+
+        if (result.statusCode === 200 || result.statusCode === 201) {
+          showNotification('success', 'Thành công', 'Xóa người giám sát thành công');
+          loadSupervisors(currentSupervisorPage, supervisorSearchTerm);
+        } else {
+          throw new Error(result.message || 'Không thể xóa người giám sát');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('error', 'Lỗi', error.message || 'Có lỗi xảy ra khi xóa người giám sát');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    document.getElementById('supervisors-tab').addEventListener('shown.bs.tab', () => {
+      loadSupervisors(currentSupervisorPage, supervisorSearchTerm);
+    });
+
+    window.addEventListener('load', () => {
+      fetchCourseDetail();
+      
+      if (window.location.hash === '#supervisors') {
+        const supervisorTab = document.getElementById('supervisors-tab');
+        const tab = new bootstrap.Tab(supervisorTab);
+        tab.show();
+      }
+    });

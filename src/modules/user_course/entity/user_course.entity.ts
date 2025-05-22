@@ -20,7 +20,7 @@ export class UserCourse extends BaseEntity {
     @Column({
         type: 'enum',
         enum: EUserCourseStatus,
-        default: EUserCourseStatus.RESIGN,
+        default: EUserCourseStatus.INACTIVE,
     })
     status: EUserCourseStatus;
 

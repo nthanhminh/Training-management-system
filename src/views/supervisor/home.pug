@@ -1,0 +1,236 @@
+extends layout
+
+block content
+  .container-fluid
+    // Thống kê tổng quan
+    .row.mb-4
+      .col-md-4(data-aos="fade-up", data-aos-delay="0")
+        .stats-card
+          .d-flex.align-items-center
+            .stats-icon
+              i.fas.fa-book
+            .ms-3
+              .stats-number 12
+              .stats-label Khóa học
+      .col-md-4(data-aos="fade-up", data-aos-delay="100")
+        .stats-card
+          .d-flex.align-items-center
+            .stats-icon
+              i.fas.fa-tasks
+            .ms-3
+              .stats-number 36
+              .stats-label Môn học
+      .col-md-4(data-aos="fade-up", data-aos-delay="200")
+        .stats-card
+          .d-flex.align-items-center
+            .stats-icon
+              i.fas.fa-video
+            .ms-3
+              .stats-number 120
+              .stats-label Video học tập
+
+    // Khóa học gần đây
+    .row.mb-4
+      .col-12
+        .card(data-aos="fade-up")
+          .card-header.bg-transparent.border-0.d-flex.justify-content-between.align-items-center
+            h4.mb-0
+              i.fas.fa-clock.me-2
+              | Khóa học gần đây
+            a.btn.btn-primary.btn-sm(href="/views/supervisor/courses")
+              i.fas.fa-plus.me-2
+              | Thêm khóa học
+          .card-body
+            .table-responsive
+              table.table.table-hover
+                thead
+                  tr
+                    th Tên khóa học
+                    th Số học viên
+                    th Trạng thái
+                    th Thao tác
+                tbody
+                  tr(data-aos="fade-up")
+                    td
+                      .d-flex.align-items-center
+                        i.fas.fa-book.me-3.text-primary
+                        span Node.js Cơ bản đến Nâng cao
+                    td
+                      .d-flex.align-items-center
+                        i.fas.fa-users.me-2.text-muted
+                        span 25 học viên
+                    td
+                      span.badge.bg-success
+                        i.fas.fa-check-circle.me-1
+                        | Đang hoạt động
+                    td
+                      .btn-group
+                        a.btn.btn-sm.btn-outline-primary(href="/supervisor/courses/1")
+                          i.fas.fa-eye
+                        a.btn.btn-sm.btn-outline-success(href="/supervisor/courses/1/edit")
+                          i.fas.fa-edit
+                        button.btn.btn-sm.btn-outline-danger(type="button", onclick="deleteCourse('1')")
+                          i.fas.fa-trash
+                  tr(data-aos="fade-up")
+                    td
+                      .d-flex.align-items-center
+                        i.fas.fa-book.me-3.text-primary
+                        span React.js Masterclass
+                    td
+                      .d-flex.align-items-center
+                        i.fas.fa-users.me-2.text-muted
+                        span 18 học viên
+                    td
+                      span.badge.bg-success
+                        i.fas.fa-check-circle.me-1
+                        | Đang hoạt động
+                    td
+                      .btn-group
+                        a.btn.btn-sm.btn-outline-primary(href="/supervisor/courses/2")
+                          i.fas.fa-eye
+                        a.btn.btn-sm.btn-outline-success(href="/supervisor/courses/2/edit")
+                          i.fas.fa-edit
+                        button.btn.btn-sm.btn-outline-danger(type="button", onclick="deleteCourse('2')")
+                          i.fas.fa-trash
+                  tr(data-aos="fade-up")
+                    td
+                      .d-flex.align-items-center
+                        i.fas.fa-book.me-3.text-primary
+                        span Angular Framework
+                    td
+                      .d-flex.align-items-center
+                        i.fas.fa-users.me-2.text-muted
+                        span 15 học viên
+                    td
+                      span.badge.bg-warning
+                        i.fas.fa-clock.me-1
+                        | Đang chờ
+                    td
+                      .btn-group
+                        a.btn.btn-sm.btn-outline-primary(href="/supervisor/courses/3")
+                          i.fas.fa-eye
+                        a.btn.btn-sm.btn-outline-success(href="/supervisor/courses/3/edit")
+                          i.fas.fa-edit
+                        button.btn.btn-sm.btn-outline-danger(type="button", onclick="deleteCourse('3')")
+                          i.fas.fa-trash
+
+    // Thống kê chi tiết
+    .row
+      .col-md-6.mb-4(data-aos="fade-right")
+        .card.h-100
+          .card-header.bg-transparent.border-0
+            h4.mb-0
+              i.fas.fa-chart-line.me-2
+              | Thống kê học viên
+          .card-body
+            canvas#studentChart
+
+      .col-md-6.mb-4(data-aos="fade-left")
+        .card.h-100
+          .card-header.bg-transparent.border-0
+            h4.mb-0
+              i.fas.fa-chart-pie.me-2
+              | Phân bố khóa học
+          .card-body
+            canvas#courseChart
+
+  script(src="https://cdn.jsdelivr.net/npm/chart.js")
+  script.
+    // Hiệu ứng hover cho bảng
+    const tableRows = document.querySelectorAll('tbody tr');
+    tableRows.forEach(row => {
+      row.addEventListener('mouseenter', () => {
+        gsap.to(row, {
+          backgroundColor: 'rgba(108, 92, 231, 0.1)',
+          duration: 0.3
+        });
+      });
+      row.addEventListener('mouseleave', () => {
+        gsap.to(row, {
+          backgroundColor: 'transparent',
+          duration: 0.3
+        });
+      });
+    });
+
+    // Biểu đồ thống kê học viên
+    const studentCtx = document.getElementById('studentChart').getContext('2d');
+    new Chart(studentCtx, {
+      type: 'line',
+      data: {
+        labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'],
+        datasets: [{
+          label: 'Học viên mới',
+          data: [65, 59, 80, 81, 56, 55],
+          borderColor: '#6c5ce7',
+          tension: 0.4,
+          fill: true,
+          backgroundColor: 'rgba(108, 92, 231, 0.1)'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          title: {
+            display: true,
+            text: 'Thống kê học viên theo tháng'
+          }
+        }
+      }
+    });
+
+    // Biểu đồ phân bố khóa học
+    const courseCtx = document.getElementById('courseChart').getContext('2d');
+    new Chart(courseCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Node.js', 'React', 'Angular', 'Vue.js'],
+        datasets: [{
+          data: [30, 25, 20, 25],
+          backgroundColor: [
+            '#6c5ce7',
+            '#a29bfe',
+            '#74b9ff',
+            '#0984e3'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          title: {
+            display: true,
+            text: 'Phân bố học viên theo khóa học'
+          }
+        }
+      }
+    });
+
+    // Hàm xóa khóa học
+    function deleteCourse(id) {
+      if (confirm('Bạn có chắc chắn muốn xóa khóa học này?')) {
+        // Thêm hiệu ứng loading
+        const overlay = document.querySelector('.loading-overlay');
+        overlay.classList.add('active');
+
+        // Giả lập API call
+        setTimeout(() => {
+          overlay.classList.remove('active');
+          // Thêm hiệu ứng xóa
+          const row = document.querySelector(`tr[data-course-id="${id}"]`);
+          gsap.to(row, {
+            height: 0,
+            opacity: 0,
+            duration: 0.5,
+            onComplete: () => row.remove()
+          });
+        }, 1000);
+      }
+    } 
+    

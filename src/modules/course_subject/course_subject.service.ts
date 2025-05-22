@@ -42,6 +42,8 @@ export class CourseSubjectService extends BaseServiceAbstract<CourseSubject> {
             },
         );
 
+        console.log('CourseSubject', courseSubject);
+
         const checkIsSupervisorCourse = await this.supervisorCourseService.findOneByCondition({
             course: {
                 id: courseSubject.course.id,
@@ -58,14 +60,18 @@ export class CourseSubjectService extends BaseServiceAbstract<CourseSubject> {
         const finishSubjectForTrainees = courseSubject.userSubjects.map((userSubject) =>
             this.userSubjectService.finishSubjectForTrainee(userSubject.id, userSubject.user),
         );
+
+        console.log(finishSubjectForTrainees);
         try {
-            Promise.all(finishSubjectForTrainees);
+            console.log('Testing');
+            await Promise.all(finishSubjectForTrainees);
             return {
                 data: await this.courseSubjectRepository.update(courseSubjectId, {
                     status: ECourseSubjectStatus.FINISH,
                 }),
             };
         } catch (error) {
+            console.log(error);
             throw new UnprocessableEntityException('courses.Error when mark the subject of course is finish');
         }
     }
