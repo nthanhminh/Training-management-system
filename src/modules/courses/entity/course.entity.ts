@@ -14,14 +14,14 @@ import { User } from '@modules/users/entity/user.entity';
 import { CourseSubject } from '@modules/course_subject/entity/course_subject.entity';
 import { UserCourse } from '@modules/user_course/entity/user_course.entity';
 import { SupervisorCourse } from '@modules/supervisor_course/entity/supervisor_course.entity';
-import { DEFAULT_COURSE_THUMBNAIL } from 'src/constants/contants';
+import { DEFAULT_COURSE_THUMBNAIL, NAME_LENGTH } from 'src/constants/contants';
 
 @Entity()
 export class Course extends BaseEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ length: 500 })
+    @Column({ length: NAME_LENGTH })
     name: string;
 
     @Column({

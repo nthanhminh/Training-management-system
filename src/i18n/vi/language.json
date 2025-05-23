@@ -1,4 +1,5 @@
 {
   "Unauthorized": "Bạn không có quyền truy cập",
-  "Forbidden Resource": "Tài nguyên bị cấm"
+  "Forbidden Resource": "Tài nguyên bị cấm",
+  "Invalid data": "Dữ liệu không hợp lệ"
 }

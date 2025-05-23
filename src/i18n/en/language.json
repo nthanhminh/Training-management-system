@@ -1,4 +1,6 @@
 {
     "Unauthorized": "You just don't have permission to",
-    "Forbidden Resource": "Forbidden Resource"
+    "Forbidden Resource": "Forbidden Resource",
+    "You don't have permission to do this": "You don't have permission to do this",
+    "Invalid data": "The provided data is invalid"
 }
