@@ -1,0 +1,542 @@
+extends layout
+
+block content
+  // Loading overlay
+  #loadingOverlay
+    .loading-spinner
+      .spinner-border.text-primary(role="status")
+        span.visually-hidden Đang tải...
+
+  .container-fluid.py-4
+    .row
+      .col-12
+        .card.mb-4.shadow-sm
+          .card-body
+            .d-flex.justify-content-between.align-items-center.mb-4
+              h2.mb-0#courseName
+              .d-flex.align-items-center
+                span.badge.bg-primary#courseStatus.me-3
+            .row
+              .col-md-8
+                .mb-4
+                  h5 Mô tả
+                  p#courseDescription
+                .row.mb-4
+                  .col-md-6
+                    h5 Ngày bắt đầu
+                    p#courseStartDate
+                  .col-md-6
+                    h5 Ngày kết thúc
+                    p#courseEndDate
+              .col-md-4
+                img#courseImage.img-fluid.rounded.shadow-sm(src="", alt="Course Image")
+
+    .row.mt-4
+      .col-12
+        .card.shadow-sm
+          .card-header.bg-white.d-flex.justify-content-between.align-items-center
+            h3.mb-0
+              i.fas.fa-book-open.me-2
+              | Danh sách môn học
+            .header-actions
+              button.btn.btn-primary.btn-sm
+                i.fas.fa-plus.me-2
+                | Thêm môn học
+          .card-body
+            .row#subjectsList
+              // Dữ liệu môn học sẽ được thêm vào đây
+
+  // Modal chỉnh sửa khóa học
+  #editCourseModal.modal.fade(tabindex="-1")
+    .modal-dialog.modal-lg
+      .modal-content
+        .modal-header
+          h5.modal-title
+            i.fas.fa-edit.me-2
+            | Chỉnh sửa khóa học
+          button.btn-close(type="button", data-bs-dismiss="modal")
+        .modal-body
+          form#editCourseForm
+            .mb-3
+              label.form-label(for="editName") Tên khóa học
+              input#editName.form-control(type="text", name="name", required)
+            
+            .mb-3
+              label.form-label(for="editDescription") Mô tả
+              textarea#editDescription.form-control(name="description", rows="3", required)
+            
+            .row.mb-3
+              .col-md-6
+                label.form-label(for="editStartDate") Ngày bắt đầu
+                input#editStartDate.form-control(type="date", name="startDate", required)
+              .col-md-6
+                label.form-label(for="editEndDate") Ngày kết thúc
+                input#editEndDate.form-control(type="date", name="endDate", required)
+            
+            .mb-3
+              label.form-label(for="editStatus") Trạng thái
+              select#editStatus.form-select(name="status", required)
+                option(value="DISABLED") Không hoạt động
+                option(value="ACTIVE") Đang hoạt động
+        .modal-footer
+          button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Hủy
+          button.btn.btn-primary(type="submit") Lưu thay đổi
+
+  style.
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .loading-spinner {
+      text-align: center;
+    }
+    .spinner-border {
+      width: 3rem;
+      height: 3rem;
+    }
+    .card {
+      transition: all 0.3s ease;
+      border: none;
+      border-radius: 15px;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card-header {
+      border-bottom: 2px solid #f8f9fa;
+      border-radius: 15px 15px 0 0 !important;
+    }
+    .subject-card {
+      border: none;
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      background: white;
+      transition: all 0.3s ease;
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    .subject-card:hover {
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      transform: translateY(-3px);
+    }
+    .subject-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f8f9fa;
+    }
+    .subject-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin: 0;
+    }
+    .subject-description {
+      color: #6c757d;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .tasks-section {
+      margin-top: 1.5rem;
+    }
+    .tasks-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .tasks-header i {
+      color: #0d6efd;
+      margin-right: 0.5rem;
+    }
+    .task-item {
+      padding: 1rem;
+      margin: 0.75rem 0;
+      border-radius: 10px;
+      background: #f8f9fa;
+      transition: all 0.3s ease;
+      border: 1px solid #e9ecef;
+    }
+    .task-item:hover {
+      background: #e9ecef;
+      transform: translateX(5px);
+      border-color: #0d6efd;
+    }
+    .task-title {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+    }
+    .task-link {
+      display: inline-flex;
+      align-items: center;
+      color: #0d6efd;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+    .task-link:hover {
+      color: #0a58ca;
+    }
+    .task-link i {
+      margin-right: 0.5rem;
+    }
+    .badge {
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+    }
+    #courseImage {
+      max-height: 300px;
+      object-fit: cover;
+      width: 100%;
+      border-radius: 15px;
+    }
+    .no-tasks {
+      text-align: center;
+      padding: 2rem;
+      background: #f8f9fa;
+      border-radius: 10px;
+      color: #6c757d;
+    }
+    .no-tasks i {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #dee2e6;
+    }
+    .modal-content {
+      border: none;
+      border-radius: 15px;
+    }
+    .modal-header {
+      border-bottom: 2px solid #f8f9fa;
+      border-radius: 15px 15px 0 0;
+    }
+    .modal-footer {
+      border-top: 2px solid #f8f9fa;
+      border-radius: 0 0 15px 15px;
+    }
+    .form-control, .form-select {
+      border-radius: 8px;
+      border: 1px solid #dee2e6;
+      padding: 0.75rem;
+      transition: all 0.3s ease;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    .form-label {
+      font-weight: 500;
+      color: #2c3e50;
+    }
+    .form-check-input {
+      width: 3em;
+      height: 1.5em;
+      margin-top: 0.25em;
+      vertical-align: top;
+      background-color: #fff;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      border: 1px solid rgba(0, 0, 0, 0.25);
+      appearance: none;
+      color-adjust: exact;
+      print-color-adjust: exact;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .form-check-input:checked {
+      background-color: #198754;
+      border-color: #198754;
+      box-shadow: 0 0 10px rgba(25, 135, 84, 0.5);
+    }
+    
+    .form-check-input:disabled {
+      opacity: 1;
+      cursor: not-allowed;
+    }
+    
+    .form-check-input:checked:disabled {
+      background-color: #198754;
+      border-color: #198754;
+      box-shadow: 0 0 15px rgba(25, 135, 84, 0.7);
+    }
+    
+    .form-check-label {
+      margin-left: 0.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .form-check-input:checked + .form-check-label {
+      color: #198754;
+      font-weight: 600;
+    }
+
+  script.
+    // Hàm hiển thị loading
+    function showLoading() {
+      document.getElementById('loadingOverlay').style.display = 'flex';
+    }
+
+    // Hàm ẩn loading
+    function hideLoading() {
+      document.getElementById('loadingOverlay').style.display = 'none';
+    }
+
+    // Hàm format ngày tháng
+    function formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString('vi-VN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    // Hàm render danh sách môn học
+    function renderSubjects(subjects) {
+      const subjectsList = document.getElementById('subjectsList');
+      subjectsList.innerHTML = '';
+
+      subjects.forEach(courseSubject => {
+        if (courseSubject.subject) {
+          const subjectCard = document.createElement('div');
+          subjectCard.className = 'col-md-6 col-lg-4 mb-4';
+          subjectCard.innerHTML = `
+            <div class="subject-card">
+              <div class="subject-header">
+                <h4 class="subject-title">${courseSubject.subject.name}</h4>
+                <div class="d-flex align-items-center">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input status-toggle" type="checkbox" 
+                           role="switch" 
+                           id="status-${courseSubject.id}"
+                           data-id="${courseSubject.id}"
+                           ${courseSubject.status === 'FINISH' ? 'checked disabled' : ''}>
+                    <label class="form-check-label" for="status-${courseSubject.id}">
+                      ${courseSubject.status === 'FINISH' ? 'Hoàn thành' : 'Đang thực hiện'}
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <p class="subject-description">${courseSubject.subject.description || 'Không có mô tả'}</p>
+              
+              <div class="tasks-section">
+                <div class="tasks-header">
+                  <i class="fas fa-tasks"></i>
+                  <h5 class="mb-0">Nhiệm vụ</h5>
+                </div>
+                
+                ${courseSubject.subject.tasksCreated.length > 0 ? `
+                  <div class="tasks-list">
+                    ${courseSubject.subject.tasksCreated.map(task => `
+                      <div class="task-item">
+                        <h6 class="task-title">${task.title}</h6>
+                        <a href="${task.contentFileLink}" target="_blank" class="task-link">
+                          <i class="fas fa-play-circle"></i>
+                          Xem video bài giảng
+                        </a>
+                      </div>
+                    `).join('')}
+                  </div>
+                ` : `
+                  <div class="no-tasks">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>Chưa có nhiệm vụ nào</p>
+                  </div>
+                `}
+              </div>
+            </div>
+          `;
+          subjectsList.appendChild(subjectCard);
+        }
+      });
+
+      // Thêm sự kiện cho các checkbox
+      document.querySelectorAll('.status-toggle').forEach(checkbox => {
+        checkbox.addEventListener('change', async function() {
+          if (this.checked) {
+            const subjectId = this.dataset.id;
+            if (confirm('Bạn có chắc chắn muốn đánh dấu môn học này đã hoàn thành?')) {
+              try {
+                showLoading();
+                const response = await fetch(`/course_subject/${subjectId}`, {
+                  method: 'PATCH',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    status: 'FINISH'
+                  })
+                });
+
+                const data = await response.json();
+                
+                if (data.statusCode === 200 || data.statusCode === 201) {
+                  showNotification('success', 'Thành công', 'Cập nhật trạng thái môn học thành công');
+                  // Cập nhật label và disable checkbox
+                  const label = this.nextElementSibling;
+                  label.textContent = 'Hoàn thành';
+                  label.style.color = '#198754';
+                  label.style.fontWeight = '600';
+                  this.disabled = true;
+                } else {
+                  // Nếu lỗi thì uncheck lại
+                  this.checked = false;
+                  throw new Error(data.message || 'Không thể cập nhật trạng thái môn học');
+                }
+              } catch (error) {
+                console.error('Error:', error);
+                showNotification('error', 'Lỗi', error.message || 'Có lỗi xảy ra khi cập nhật trạng thái môn học');
+              } finally {
+                hideLoading();
+              }
+            } else {
+              // Nếu user không xác nhận thì uncheck lại
+              this.checked = false;
+            }
+          }
+        });
+      });
+    }
+
+    let currentCourse = null;
+    // Hàm lấy dữ liệu chi tiết khóa học
+    async function fetchCourseDetail() {
+      showLoading();
+      try {
+        const pathParts = window.location.pathname.split('/');
+        const courseId = pathParts[pathParts.length - 1];
+        
+        if (!courseId) {
+          throw new Error('Không tìm thấy ID khóa học');
+        }
+        
+        const response = await fetch(`/courses/supervisor/detail?courseId=${courseId}`);
+        const result = await response.json();
+        
+        if (result.statusCode === 200 && result.data) {
+          currentCourse = result.data;
+          
+          // Cập nhật thông tin khóa học
+          document.getElementById('courseName').textContent = currentCourse.name;
+          document.getElementById('courseStatus').textContent = 
+            currentCourse.status === 'ACTIVE' ? 'Đang hoạt động' : 'Không hoạt động';
+          document.getElementById('courseStatus').className = 
+            `badge ${currentCourse.status === 'ACTIVE' ? 'bg-success' : 'bg-warning'} me-3`;
+          document.getElementById('courseDescription').textContent = currentCourse.description;
+          document.getElementById('courseStartDate').textContent = formatDate(currentCourse.startDate);
+          document.getElementById('courseEndDate').textContent = formatDate(currentCourse.endDate);
+          document.getElementById('courseImage').src = currentCourse.image;
+          
+          // Render danh sách môn học
+          renderSubjects(currentCourse.courseSubjects);
+        } else {
+          throw new Error(result.message || 'Không thể tải thông tin khóa học');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert(error.message || 'Có lỗi xảy ra khi tải thông tin khóa học');
+        setTimeout(() => {
+          window.location.href = '/supervisor/courses';
+        }, 2000);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Xử lý form chỉnh sửa
+    document.getElementById('editCourseForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      showLoading();
+
+      const formData = {
+        name: document.getElementById('editName').value,
+        description: document.getElementById('editDescription').value,
+        startDate: document.getElementById('editStartDate').value,
+        endDate: document.getElementById('editEndDate').value,
+        status: document.getElementById('editStatus').value
+      };
+
+      try {
+        const pathParts = window.location.pathname.split('/');
+        const courseId = pathParts[pathParts.length - 1];
+        
+        const response = await fetch(`/courses/${courseId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+          // Đóng modal
+          bootstrap.Modal.getInstance(document.getElementById('editCourseModal')).hide();
+          
+          // Cập nhật lại dữ liệu
+          await fetchCourseDetail();
+          
+          // Hiển thị thông báo thành công
+          alert('Cập nhật khóa học thành công');
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Có lỗi xảy ra khi cập nhật khóa học');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert(error.message || 'Có lỗi xảy ra khi cập nhật khóa học');
+      } finally {
+        hideLoading();
+      }
+    });
+
+    // Load dữ liệu khi trang được tải
+    window.addEventListener('load', fetchCourseDetail);
+
+    // Xử lý sự kiện hoàn thành subject
+    document.querySelectorAll('.finish-subject').forEach(button => {
+      button.addEventListener('click', async function() {
+        const subjectId = this.dataset.id;
+        if (confirm('Bạn có chắc chắn muốn đánh dấu môn học này đã hoàn thành?')) {
+          try {
+            showLoading();
+            const response = await fetch(`/course_subject/${subjectId}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                status: 'FINISH'
+              })
+            });
+
+            const data = await response.json();
+            
+            if (data.statusCode === 200 || data.statusCode === 201) {
+              showNotification('success', 'Thành công', 'Cập nhật trạng thái môn học thành công');
+              // Reload trang để cập nhật trạng thái
+              window.location.reload();
+            } else {
+              throw new Error(data.message || 'Không thể cập nhật trạng thái môn học');
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            showNotification('error', 'Lỗi', error.message || 'Có lỗi xảy ra khi cập nhật trạng thái môn học');
+          } finally {
+            hideLoading();
+          }
+        }
+      });
+    }); 

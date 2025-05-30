@@ -6,6 +6,12 @@ export class CreateTaskDto {
         required: true,
     })
     @IsNotEmpty()
+    title: string;
+
+    @ApiProperty({
+        required: true,
+    })
+    @IsNotEmpty()
     contentFileLink: string;
 
     @ApiProperty({

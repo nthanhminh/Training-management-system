@@ -22,7 +22,6 @@ import { CourseSubjectModule } from '@modules/course_subject/course_subject.modu
 import { AuthModule } from '@modules/auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
 import { PageController } from './controllers/page.controller';
-// import { AuthModule } from './auth/auth.module';
 
 @Module({
     imports: [

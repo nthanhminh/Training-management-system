@@ -6,6 +6,7 @@ import { CreateTaskDto } from './dto/createTask.dto';
 import { DeepPartial, UpdateResult } from 'typeorm';
 import { UpdateTaskDto } from './dto/updateTask.dto';
 import { SubjectService } from '@modules/subjects/subjects.service';
+import { AppResponse } from 'src/types/common.type';
 
 @Injectable()
 export class TaskService extends BaseServiceAbstract<Task> {
@@ -27,7 +28,14 @@ export class TaskService extends BaseServiceAbstract<Task> {
         return await this.taskRepository.create({
             contentFileLink: dto.contentFileLink,
             subject: subject,
+            title: dto.title
         });
+    }
+
+    async deleteTask(id: string) : Promise<AppResponse<UpdateResult>> {
+        return {
+            data: await this.taskRepository.softDelete(id),
+        };
     }
 
     async deleteTaskBySubjectId(subjectId: string): Promise<UpdateResult> {

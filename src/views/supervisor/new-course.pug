@@ -1,0 +1,320 @@
+extends layout
+
+block content
+  .container-fluid.p-4
+    .row.mb-4
+      .col-12
+        h1 Tạo khóa học mới
+        hr
+
+    form#newCourseForm.row.g-4
+      .col-md-6
+        .card.h-100
+          .card-body
+            h5.card-title.mb-4 Thông tin cơ bản
+            .mb-3
+              label.form-label(for="courseName") Tên khóa học
+              input#courseName.form-control(type="text", name="name", required)
+            
+            .mb-3
+              label.form-label(for="courseDescription") Mô tả
+              textarea#courseDescription.form-control(name="description", rows="4", required)
+            
+            .mb-3
+              label.form-label(for="courseStatus") Trạng thái
+              select#courseStatus.form-select(name="status", required)
+                option(value="DISABLED") Không hoạt động
+                option(value="ACTIVE") Đang hoạt động
+            
+            .row.mb-3
+              .col-md-6
+                label.form-label(for="startDate") Ngày bắt đầu
+                input#startDate.form-control(type="date", name="startDate", required)
+              .col-md-6
+                label.form-label(for="endDate") Ngày kết thúc
+                input#endDate.form-control(type="date", name="endDate", required)
+
+      .col-md-6
+        .card.h-100
+          .card-body
+            h5.card-title.mb-4 Chọn môn học
+            .mb-3
+              .input-group
+                input#subjectSearch.form-control(type="text", placeholder="Tìm kiếm môn học...")
+                button#searchSubject.btn.btn-primary(type="button")
+                  i.fas.fa-search.me-2
+                  | Tìm kiếm
+            
+            .mb-3
+              h6 Môn học đã chọn
+              #selectedSubjects.list-group.mb-3
+                // Danh sách môn học đã chọn sẽ được thêm vào đây
+            
+            .mb-3
+              h6 Kết quả tìm kiếm
+              #subjectSearchResults.list-group
+                // Kết quả tìm kiếm sẽ được hiển thị ở đây
+
+    .row.mt-4
+      .col-12.text-end
+        a.btn.btn-secondary.me-2(href="/views/supervisor/courses")
+          i.fas.fa-arrow-left.me-2
+          | Quay lại
+        button#submitCourse.btn.btn-primary(type="submit", form="newCourseForm")
+          i.fas.fa-save.me-2
+          | Tạo khóa học
+
+  style.
+    .card {
+      border: none;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+    .card-body {
+      padding: 2rem;
+    }
+    .form-control, .form-select {
+      border-radius: 8px;
+      padding: 0.75rem;
+      border: 1px solid #dee2e6;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    .form-label {
+      font-weight: 500;
+      color: #2c3e50;
+    }
+    .list-group-item {
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      border: 1px solid #dee2e6;
+    }
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+    }
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .loading-spinner {
+      text-align: center;
+    }
+    .spinner-border {
+      width: 3rem;
+      height: 3rem;
+    }
+
+  script.
+    let selectedSubjects = new Set();
+    let currentPage = 1;
+    const pageSize = 10;
+
+    // Hàm hiển thị loading
+    function showLoading() {
+      const overlay = document.createElement('div');
+      overlay.id = 'loadingOverlay';
+      overlay.innerHTML = `
+        <div class="loading-spinner">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Đang tải...</span>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+    }
+
+    // Hàm ẩn loading
+    function hideLoading() {
+      const overlay = document.getElementById('loadingOverlay');
+      if (overlay) {
+        overlay.remove();
+      }
+    }
+
+    // Hàm hiển thị thông báo
+    function showNotification(type, title, message) {
+      const container = document.createElement('div');
+      container.className = 'position-fixed top-0 end-0 p-3';
+      container.style.zIndex = '9999';
+      
+      const notification = document.createElement('div');
+      notification.className = `toast align-items-center text-white bg-${type} border-0`;
+      notification.setAttribute('role', 'alert');
+      notification.setAttribute('aria-live', 'assertive');
+      notification.setAttribute('aria-atomic', 'true');
+      
+      notification.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body">
+            <strong>${title}</strong><br>
+            ${message}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+      `;
+      
+      container.appendChild(notification);
+      document.body.appendChild(container);
+      
+      const toast = new bootstrap.Toast(notification);
+      toast.show();
+      
+      notification.addEventListener('hidden.bs.toast', () => {
+        container.remove();
+      });
+    }
+
+    // Hàm tìm kiếm môn học
+    async function searchSubjects(page = 1, searchTerm = '') {
+      try {
+        showLoading();
+        const response = await fetch(`/subjects/list?page=${page}&pageSize=${pageSize}&search=${searchTerm}`);
+        const data = await response.json();
+        
+        if (data.statusCode === 200) {
+          const resultsContainer = document.getElementById('subjectSearchResults');
+          const subjects = data.data.items;
+          
+          if (subjects.length === 0) {
+            resultsContainer.innerHTML = '<div class="alert alert-info">Không tìm thấy môn học nào</div>';
+            return;
+          }
+
+          resultsContainer.innerHTML = subjects.map(subject => `
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="mb-0">${subject.name}</h6>
+                <small class="text-muted">${subject.description || 'Không có mô tả'}</small>
+              </div>
+              <button class="btn btn-sm btn-outline-primary add-subject" 
+                      data-id="${subject.id}" 
+                      data-name="${subject.name}"
+                      ${selectedSubjects.has(subject.id) ? 'disabled' : ''}>
+                ${selectedSubjects.has(subject.id) ? 'Đã chọn' : 'Thêm'}
+              </button>
+            </div>
+          `).join('');
+
+          // Thêm sự kiện cho các nút thêm môn học
+          document.querySelectorAll('.add-subject').forEach(button => {
+            button.addEventListener('click', () => {
+              const subjectId = button.dataset.id;
+              const subjectName = button.dataset.name;
+              addSubject(subjectId, subjectName);
+              button.disabled = true;
+              button.textContent = 'Đã chọn';
+            });
+          });
+        }
+      } catch (error) {
+        console.error('Error searching subjects:', error);
+        showNotification('danger', 'Lỗi', 'Không thể tìm kiếm môn học');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Hàm thêm môn học vào danh sách đã chọn
+    function addSubject(subjectId, subjectName) {
+      selectedSubjects.add(subjectId);
+      const selectedContainer = document.getElementById('selectedSubjects');
+      
+      const subjectElement = document.createElement('div');
+      subjectElement.className = 'list-group-item d-flex justify-content-between align-items-center';
+      subjectElement.innerHTML = `
+        <div>
+          <h6 class="mb-0">${subjectName}</h6>
+        </div>
+        <button class="btn btn-sm btn-outline-danger remove-subject" data-id="${subjectId}">
+          <i class="fas fa-times"></i>
+        </button>
+      `;
+
+      selectedContainer.appendChild(subjectElement);
+
+      // Thêm sự kiện xóa môn học
+      subjectElement.querySelector('.remove-subject').addEventListener('click', () => {
+        selectedSubjects.delete(subjectId);
+        subjectElement.remove();
+        // Cập nhật lại trạng thái nút thêm trong kết quả tìm kiếm
+        const addButton = document.querySelector(`.add-subject[data-id="${subjectId}"]`);
+        if (addButton) {
+          addButton.disabled = false;
+          addButton.textContent = 'Thêm';
+        }
+      });
+    }
+
+    // Xử lý sự kiện tìm kiếm
+    document.getElementById('searchSubject').addEventListener('click', () => {
+      const searchTerm = document.getElementById('subjectSearch').value;
+      currentPage = 1;
+      searchSubjects(currentPage, searchTerm);
+    });
+
+    // Thêm sự kiện khi nhấn Enter trong ô tìm kiếm
+    document.getElementById('subjectSearch').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const searchTerm = e.target.value;
+        currentPage = 1;
+        searchSubjects(currentPage, searchTerm);
+      }
+    });
+
+    // Xử lý sự kiện submit form
+    document.getElementById('newCourseForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (selectedSubjects.size === 0) {
+        showNotification('warning', 'Cảnh báo', 'Vui lòng chọn ít nhất một môn học');
+        return;
+      }
+
+      const formData = {
+        name: document.getElementById('courseName').value,
+        description: document.getElementById('courseDescription').value,
+        status: document.getElementById('courseStatus').value,
+        startDate: document.getElementById('startDate').value,
+        endDate: document.getElementById('endDate').value,
+        subjectIds: Array.from(selectedSubjects)
+      };
+
+      try {
+        showLoading();
+        const response = await fetch('/courses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (data.statusCode === 200) {
+          showNotification('success', 'Thành công', 'Tạo khóa học thành công');
+          setTimeout(() => {
+            window.location.href = '/views/supervisor/courses';
+          }, 1500);
+        } else {
+          throw new Error(data.message || 'Không thể tạo khóa học');
+        }
+      } catch (error) {
+        console.error('Error creating course:', error);
+        showNotification('danger', 'Lỗi', error.message || 'Không thể tạo khóa học');
+      } finally {
+        hideLoading();
+      }
+    }); 

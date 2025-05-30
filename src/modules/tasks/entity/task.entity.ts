@@ -20,6 +20,9 @@ export class Task extends BaseEntity {
     @Column({ length: 500 })
     contentFileLink: string;
 
+    @Column({length:120, default: ''}) 
+    title: string
+
     @ManyToOne(() => Subject, (subject) => subject.tasksCreated)
     @JoinColumn({ name: 'subjectId' })
     subject: Subject;

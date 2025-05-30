@@ -14,9 +14,15 @@ import { UsersService } from '@modules/users/user.services';
 import { ERolesUser } from '@modules/users/enums/index.enum';
 import { TaskService } from '@modules/tasks/task.service';
 import { Task } from '@modules/tasks/entity/task.entity';
-import { UpdateResult } from 'typeorm';
+import { ILike, UpdateResult } from 'typeorm';
 import { UpdateSubjectDto, UpdateSubjectTask } from './dto/updateSubject.dto';
 import { User } from '@modules/users/entity/user.entity';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { FindSubjectDto } from './dto/find.dto';
+import { AppResponse, FindAllResponse } from 'src/types/common.type';
+import { getLimitAndSkipHelper } from 'src/helper/pagination.helper';
+import { SubjectResponseDto } from './dto/subjectResponse.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class SubjectService extends BaseServiceAbstract<Subject> {
@@ -30,8 +36,46 @@ export class SubjectService extends BaseServiceAbstract<Subject> {
         super(subjectRepository);
     }
 
+    async getSubjectList(dto: FindSubjectDto, user: User): Promise<AppResponse<FindAllResponse<Subject>>> {
+        const { page, pageSize, name } = dto;
+        const { limit, skip } = getLimitAndSkipHelper(page, pageSize);
+
+        const condition: any = {
+            creator: {
+                id: user.id,
+            },
+        };
+        if (name) {
+            condition.name = ILike(`%${name}%`);
+        }
+
+        const result = await this.subjectRepository.findAll(condition, {
+            skip,
+            take: limit,
+        });
+
+        return {
+            data: result,
+        };
+    }
+
+    async getSubjectDetail(subjectId: string, user: User) : Promise<AppResponse<SubjectResponseDto>> {
+        const subject = await this.subjectRepository.findOneByCondition(
+            {
+                id: subjectId,
+            },
+            {
+                relations: ['tasksCreated', 'creator'],
+            }
+        )
+
+        return {
+            data: plainToInstance(SubjectResponseDto, subject),
+        };
+    }
+
     async createSubject(dto: CreateSubjectDto, user: User): Promise<Subject> {
-        const { name, description, creatorId, tasks } = dto;
+        const { name, description, tasks } = dto;
         const newSubject = await this.subjectRepository.create({
             name,
             description,
@@ -57,6 +101,7 @@ export class SubjectService extends BaseServiceAbstract<Subject> {
         }
         const tasksData: Promise<Task>[] = tasks.map((task: TaskDto): Promise<Task> => {
             return this.taskService.createTask({
+                title: task.title,
                 contentFileLink: task.contentFileLink,
                 subjectId: subjectId,
             });
@@ -70,7 +115,14 @@ export class SubjectService extends BaseServiceAbstract<Subject> {
     }
 
     async deleteSubject(subjectId: string, user: User): Promise<UpdateResult> {
-        const subject = await this.subjectRepository.findOneById(subjectId);
+        const subject = await this.subjectRepository.findOneByCondition(
+            {
+                id: subjectId
+            },
+            {
+                relations: ['creator']
+            }
+        );
         if (!subject) {
             throw new NotFoundException('subjects.Subject not found');
         }

@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateCourseDto } from './dto/createCourse.dto';
-import { AppResponse } from 'src/types/common.type';
+import { AppResponse, FindAllResponse } from 'src/types/common.type';
 import { CourseService } from './course.service';
 import { Course } from './entity/course.entity';
 import { CurrentUserDecorator } from 'src/decorators/current-user.decorator';
@@ -32,10 +32,8 @@ export class CourseController {
     async getCourseBySupervisor(
         @Query() dto: FindCourseDto,
         @CurrentUserDecorator() user: User,
-    ): Promise<AppResponse<Course[]>> {
-        return {
-            data: await this.courseService.supervisorFindCourse(dto, user),
-        };
+    ): Promise<AppResponse<FindAllResponse<Course>>> {
+        return await this.courseService.supervisorFindCourse(dto, user);
     }
 
     @Get('supervisor/detail')

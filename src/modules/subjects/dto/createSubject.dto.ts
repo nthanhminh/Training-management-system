@@ -19,17 +19,10 @@ export class CreateSubjectDto {
 
     @ApiProperty({
         required: true,
-        default: '5f88e78d-8389-4701-bdf6-f174403f0105',
-    })
-    @IsNotEmpty()
-    @IsUUID('4')
-    creatorId: string;
-
-    @ApiProperty({
-        required: true,
         default: [
             {
                 contentFileLink: 'https://www.youtube.com/watch?v=rw4dqBDKbYc',
+                title: 'Title 1'
             },
         ],
     })
@@ -46,4 +39,11 @@ export class TaskDto {
     })
     @IsNotEmpty()
     contentFileLink: string;
+
+    @ApiProperty({
+        required: true,
+        default: '',
+    })
+    @IsNotEmpty()
+    title: string;
 }

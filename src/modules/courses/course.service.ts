@@ -152,13 +152,14 @@ export class CourseService extends BaseServiceAbstract<Course> {
         };
     }
 
-    async supervisorFindCourse(dto: FindCourseDto, user: User): Promise<Course[]> {
+    async supervisorFindCourse(dto: FindCourseDto, user: User): Promise<AppResponse<FindAllResponse<Course>>> {
         const { name, creatorName, page, pageSize } = dto;
         const { limit, skip } = getLimitAndSkipHelper(page, pageSize);
 
         const queryBuilder = this.courseRepository
             .createQueryBuilder('course')
             .leftJoinAndSelect('course.supervisorCourses', 'supervisorCourses')
+            .leftJoinAndSelect('course.creator', 'creator')
             .where('supervisorCourses.userId = :userId', { userId: user.id });
 
         if (name) {
@@ -175,7 +176,14 @@ export class CourseService extends BaseServiceAbstract<Course> {
 
         queryBuilder.skip(skip).take(limit);
 
-        return await queryBuilder.getMany();
+        const [items, count] = await queryBuilder.getManyAndCount();
+
+        return {
+            data: {
+                items,
+                count,
+            },
+        };
     }
 
     async getCourseForTrainee(dto: FindCourseDto, user: User): Promise<AppResponse<Course[]>> {

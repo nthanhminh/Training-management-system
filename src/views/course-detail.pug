@@ -832,7 +832,7 @@ block scripts
                          onclick="toggleTaskCompletion(event, '${userTask.id}')">
                     </div>
                     <div class="task-content">
-                      <h4 class="task-title">${userTask.task.contentFileLink ? 'Video bài học' : 'Bài tập'}</h4>
+                      <h4 class="task-title">${userTask.task.contentFileLink ? userTask.task.title : 'Video bài học'}</h4>
                       <p class="task-description">${userTask.task.contentFileLink || 'Chưa có mô tả'}</p>
                     </div>
                   </li>
@@ -907,8 +907,7 @@ block scripts
       }
 
       // Update task content
-      document.getElementById('taskTitle').textContent = task.task.contentFileLink ? 'Video bài học' : 'Bài tập';
-      document.getElementById('taskDescription').textContent = task.task.contentFileLink || '';
+      document.getElementById('taskTitle').textContent = task.task.contentFileLink ? task.task.title : 'Video bài học';
 
       // Update video
       const videoContainer = document.getElementById('videoContainer');

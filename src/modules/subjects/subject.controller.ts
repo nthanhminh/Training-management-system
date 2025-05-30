@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { SubjectService } from './subjects.service';
 import { CreateSubjectDto } from './dto/createSubject.dto';
-import { AppResponse, ResponseMessage } from 'src/types/common.type';
+import { AppResponse, FindAllResponse, ResponseMessage } from 'src/types/common.type';
 import { Subject } from './entity/subject.entity';
 import { UpdateResult } from 'typeorm';
 import { UpdateSubjectDto, UpdateSubjectTask } from './dto/updateSubject.dto';
@@ -12,11 +12,29 @@ import { SessionAuthGuard } from '@modules/auth/guards/session.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from '@modules/auth/guards/roles.guard';
 import { ERolesUser } from '@modules/users/enums/index.enum';
+import { FindSubjectDto } from './dto/find.dto';
+import { SubjectResponseDto } from './dto/subjectResponse.dto';
 
 @Controller('subjects')
 @ApiTags('subjects')
 export class SubjectController {
     constructor(private readonly subjectService: SubjectService) {}
+
+    @Get()
+    async getSubjectDetail(
+        @Query('subjectId') subjectId: string,
+        @CurrentUserDecorator() user: User,
+    ): Promise<AppResponse<SubjectResponseDto>> {
+        return await this.subjectService.getSubjectDetail(subjectId, user);
+    }
+
+    @Get('list')
+    async getSubjects(
+        @Query() dto: FindSubjectDto,
+        @CurrentUserDecorator() user: User,
+    ): Promise<AppResponse<FindAllResponse<Subject>>> {
+        return await this.subjectService.getSubjectList(dto, user);
+    }
 
     @Post()
     @UseGuards(SessionAuthGuard, RolesGuard)
@@ -50,7 +68,8 @@ export class SubjectController {
     }
 
     @Delete(':id')
-    @UseGuards(SessionAuthGuard)
+    @UseGuards(SessionAuthGuard, RolesGuard)
+    @Roles(ERolesUser.SUPERVISOR)
     async deleteSubjectById(
         @Param('id') id: string,
         @CurrentUserDecorator() user: User,
