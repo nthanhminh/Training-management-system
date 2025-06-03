@@ -13,8 +13,6 @@ export const databaseProviders = [
             const password = configService.get<string>('DB_PASSWORD');
             const database = configService.get<string>('DB_NAME');
 
-            console.log('Configs: ', type, host, port, username, password, database);
-
             const dataSource = new DataSource({
                 type,
                 host,

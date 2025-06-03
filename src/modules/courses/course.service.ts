@@ -35,6 +35,8 @@ import { TraineeDto, UpdateStatusTraineeDto } from './dto/trainee.dto';
 import { EUserCourseStatus } from '@modules/user_course/enum/index.enum';
 import { parseDateString } from 'src/helper/date.helper';
 import { FindMemberOfCourseDto } from './dto/findMember.dto';
+import { UserResponseDto } from '@modules/users/dto/userResponse.dto';
+import { UserCourseResponse } from '@modules/user_course/dto/UserCourseResponse.dto';
 
 @Injectable()
 export class CourseService extends BaseServiceAbstract<Course> {
@@ -107,6 +109,7 @@ export class CourseService extends BaseServiceAbstract<Course> {
                 data: userCourseList,
             };
         } catch (error) {
+            console.log(error);
             throw new UnprocessableEntityException(
                 'courses.An error occurred while inserting the trainee list into the course.',
             );
@@ -116,7 +119,7 @@ export class CourseService extends BaseServiceAbstract<Course> {
     async getAllTraineeCourseForCourse(
         dto: FindMemberOfCourseDto,
         user: User,
-    ): Promise<AppResponse<FindAllResponse<UserCourse>>> {
+    ): Promise<AppResponse<FindAllResponse<UserCourseResponse>>> {
         const { page, pageSize, search, courseId } = dto;
         const course = await this.courseRepository.findOneByCondition({
             id: courseId,
@@ -127,7 +130,12 @@ export class CourseService extends BaseServiceAbstract<Course> {
         }
         const { limit, skip } = getLimitAndSkipHelper(page, pageSize);
 
-        const condition: any = {};
+        const condition: any = {
+            course: {
+                id: courseId,
+            },
+        };
+
         if (search) {
             condition.user = {
                 name: ILike(`%${search}%`),
@@ -137,10 +145,18 @@ export class CourseService extends BaseServiceAbstract<Course> {
         const result = await this.userCourseService.findAll(condition, {
             skip,
             take: limit,
+            relations: ['user'],
         });
 
+        const formattedItems: UserCourseResponse[] = result.items.map((item) =>
+            plainToInstance(UserCourseResponse, item),
+        );
+
         return {
-            data: result,
+            data: {
+                count: result.count,
+                items: formattedItems,
+            },
         };
     }
 
@@ -155,7 +171,7 @@ export class CourseService extends BaseServiceAbstract<Course> {
         const courseDetail = await this._getCourseDetail(courseId);
         const courseSubjectsDetail = await this._getSubjectsAndTaskListFromCourseDetail(courseDetail);
         for (let i = 0; i < courseSubjectsDetail.length; i++) {
-            const courseSubject = courseSubjectsDetail[0];
+            const courseSubject = courseSubjectsDetail[i];
             const userSubject = await this.userSubjectService.addTraineeForUserSubject(
                 courseSubject.courseSubjectId,
                 trainee,

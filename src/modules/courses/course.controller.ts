@@ -34,6 +34,7 @@ import { TraineeDto, UpdateStatusTraineeDto } from './dto/trainee.dto';
 import { UserCourse } from '@modules/user_course/entity/user_course.entity';
 import { CourseWithoutCreatorDto } from './responseDto/courseResponse.dto';
 import { FindMemberOfCourseDto } from './dto/findMember.dto';
+import { UserCourseResponse } from '@modules/user_course/dto/UserCourseResponse.dto';
 
 @Controller('courses')
 @ApiTags('courses')
@@ -77,7 +78,7 @@ export class CourseController {
     async getMemberOfCourses(
         @Query() dto: FindMemberOfCourseDto,
         @CurrentUserDecorator() user: User,
-    ): Promise<AppResponse<FindAllResponse<UserCourse>>> {
+    ): Promise<AppResponse<FindAllResponse<UserCourseResponse>>> {
         return await this.courseService.getAllTraineeCourseForCourse(dto, user);
     }
 

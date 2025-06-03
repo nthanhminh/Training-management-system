@@ -1,0 +1,85 @@
+extends layout
+
+block content
+  .row.mb-4
+    .col-md-8
+      h1= task.name
+      p.text-muted= task.description
+    .col-md-4.text-end
+      a.btn.btn-primary.me-2(href=`/supervisor/tasks/${task.id}/edit`) Chỉnh sửa
+      button.btn.btn-success(data-bs-toggle="modal", data-bs-target="#addSubmissionModal") Thêm bài nộp
+
+  .row.mb-4
+    .col-md-4
+      .card
+        .card-body
+          h5.card-title Thông tin bài tập
+          ul.list-group.list-group-flush
+            li.list-group-item
+              strong Môn học: 
+              span= task.subjectName
+            li.list-group-item
+              strong Hạn nộp: 
+              span= task.dueDate
+            li.list-group-item
+              strong Số học viên đã nộp: 
+              span= task.submittedCount
+            li.list-group-item
+              strong Trạng thái: 
+              span.badge(class=task.status === 'active' ? 'bg-success' : 'bg-warning')= task.status
+            li.list-group-item
+              strong Ngày tạo: 
+              span= task.createdAt
+            li.list-group-item
+              strong Ngày cập nhật: 
+              span= task.updatedAt
+
+    .col-md-8
+      .card
+        .card-body
+          h5.card-title Danh sách bài nộp
+          .table-responsive
+            table.table.table-hover
+              thead
+                tr
+                  th Học viên
+                  th Thời gian nộp
+                  th Điểm
+                  th Trạng thái
+                  th Thao tác
+              tbody
+                each submission in submissions
+                  tr
+                    td= submission.studentName
+                    td= submission.submittedAt
+                    td= submission.score || 'Chưa chấm điểm'
+                    td
+                      span.badge(class=submission.status === 'graded' ? 'bg-success' : 'bg-warning')= submission.status
+                    td
+                      .btn-group
+                        a.btn.btn-sm.btn-info.me-2(href=`/supervisor/submissions/${submission.id}`) Chi tiết
+                        a.btn.btn-sm.btn-primary.me-2(href=`/supervisor/submissions/${submission.id}/grade`) Chấm điểm
+
+  // Modal thêm bài nộp
+  .modal.fade#addSubmissionModal(tabindex="-1")
+    .modal-dialog
+      .modal-content
+        .modal-header
+          h5.modal-title Thêm bài nộp
+          button.btn-close(type="button", data-bs-dismiss="modal")
+        .modal-body
+          form(action=`/supervisor/tasks/${task.id}/submissions`, method="POST")
+            .mb-3
+              label.form-label(for="studentId") Học viên
+              select.form-select(id="studentId", name="studentId", required)
+                each student in students
+                  option(value=student.id)= student.name
+            .mb-3
+              label.form-label(for="file") File bài nộp
+              input.form-control(type="file", id="file", name="file", required)
+            .mb-3
+              label.form-label(for="comment") Nhận xét
+              textarea.form-control(id="comment", name="comment", rows="3")
+            .text-end
+              button.btn.btn-secondary.me-2(type="button", data-bs-dismiss="modal") Hủy
+              button.btn.btn-primary(type="submit") Thêm 
