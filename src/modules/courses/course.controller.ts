@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateCourseDto } from './dto/createCourse.dto';
-import { AppResponse } from 'src/types/common.type';
+import { AppResponse, FindAllResponse } from 'src/types/common.type';
 import { CourseService } from './course.service';
 import { Course } from './entity/course.entity';
 import { CurrentUserDecorator } from 'src/decorators/current-user.decorator';
@@ -33,6 +33,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { TraineeDto, UpdateStatusTraineeDto } from './dto/trainee.dto';
 import { UserCourse } from '@modules/user_course/entity/user_course.entity';
 import { CourseWithoutCreatorDto } from './responseDto/courseResponse.dto';
+import { FindMemberOfCourseDto } from './dto/findMember.dto';
 
 @Controller('courses')
 @ApiTags('courses')
@@ -68,6 +69,16 @@ export class CourseController {
     @Post('supervisor/trainee')
     async addTrainee(@Body() dto: TraineeDto, @CurrentUserDecorator() user: User): Promise<AppResponse<UserCourse[]>> {
         return await this.courseService.addTraineesToCourse(dto, user);
+    }
+
+    @Roles(ERolesUser.SUPERVISOR)
+    @UseGuards(SessionAuthGuard, RolesGuard)
+    @Get('supervisor/members')
+    async getMemberOfCourses(
+        @Query() dto: FindMemberOfCourseDto,
+        @CurrentUserDecorator() user: User,
+    ): Promise<AppResponse<FindAllResponse<UserCourse>>> {
+        return await this.courseService.getAllTraineeCourseForCourse(dto, user);
     }
 
     @Roles(ERolesUser.SUPERVISOR)
