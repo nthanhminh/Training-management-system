@@ -2,6 +2,7 @@ import { Controller, Get, Query, Param, Res, Render } from '@nestjs/common';
 import { Response } from 'express';
 import { NoGlobalInterceptor } from '../decorators/no-global-interceptor.decorator';
 import { Reflector } from '@nestjs/core';
+import { Request } from 'express';
 
 @Controller('views')
 export class PageController {
@@ -251,5 +252,15 @@ export class PageController {
         return {
             title: 'Tạo khóa học mới',
         };
+    }
+
+    // Trang verify
+    @Get('supervisor/verify')
+    @NoGlobalInterceptor()
+    getVerifyPage(@Res() res: Response) {
+        res.render('supervisor/verify', {
+            title: 'Xác thực tài khoản',
+            layout: 'layout'
+        });
     }
 }

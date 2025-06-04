@@ -1,0 +1,41 @@
+script.
+  // Hàm xử lý response chung
+  async function handleApiResponse(response, successCallback, errorCallback) {
+    try {
+      const data = await response.json();
+      
+      if (data.statusCode === 200 || data.statusCode === 201) {
+        if (successCallback) {
+          successCallback(data);
+        }
+      } else if (data.statusCode === 401 && data.message === 'This account is not actived') {
+        showNotification('warning', 'Cảnh báo', 'Tài khoản chưa được kích hoạt. Vui lòng xác thực tài khoản.');
+        setTimeout(() => {
+          window.location.href = '/verify';
+        }, 1500);
+      } else {
+        if (errorCallback) {
+          errorCallback(data);
+        } else {
+          showNotification('error', 'Lỗi', data.message || 'Đã xảy ra lỗi');
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showNotification('error', 'Lỗi', 'Đã xảy ra lỗi không xác định');
+    }
+  }
+
+  // Hàm gọi API với xử lý response chung
+  async function callApi(url, options = {}, successCallback, errorCallback) {
+    try {
+      showLoading();
+      const response = await fetch(url, options);
+      await handleApiResponse(response, successCallback, errorCallback);
+    } catch (error) {
+      console.error('Error:', error);
+      showNotification('error', 'Lỗi', 'Đã xảy ra lỗi không xác định');
+    } finally {
+      hideLoading();
+    }
+  } 

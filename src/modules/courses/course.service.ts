@@ -459,10 +459,21 @@ export class CourseService extends BaseServiceAbstract<Course> {
         if (!newSupervisor || newSupervisor.role !== ERolesUser.SUPERVISOR) {
             throw new UnprocessableEntityException("courses.The supervisor's email is not valid");
         }
+        const checkSupervisorIsExsisted = await this.supervisorCourseService.findOneByCondition({
+            course: {
+                id: courseId,
+            },
+            user: {
+                id: newSupervisor.id,
+            },
+        });
+        if (checkSupervisorIsExsisted) {
+            throw new UnprocessableEntityException('courses.Supervisor is exsisted');
+        }
         return {
             data: await this.supervisorCourseService.create({
                 course: { id: courseId },
-                user: { id: user.id },
+                user: { id: newSupervisor.id },
             }),
         };
     }

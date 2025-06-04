@@ -261,7 +261,10 @@ block scripts
           if (#{isLogin}) {
             window.location.href = '/views/supervisor';
           } else {
-            window.location.href = '/views/supervisor/auth?mode=login';
+            // Lưu email vào localStorage để sử dụng ở trang verify
+            localStorage.setItem('userEmail', formData.email);
+            // Chuyển hướng đến trang verify
+            window.location.href = '/views/supervisor/verify';
           }
         }, 1000);
       } catch (error) {
