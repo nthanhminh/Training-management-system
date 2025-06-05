@@ -72,10 +72,12 @@ block content
             .row.mb-3
               .col-md-6
                 label.form-label(for="editStartDate") Ngày bắt đầu
-                input#editStartDate.form-control(type="date", name="startDate", required)
+                input#editStartDate.form-control(type="text", name="startDate", placeholder="dd/mm/yyyy", required)
+                .invalid-feedback Vui lòng nhập đúng định dạng ngày (dd/mm/yyyy)
               .col-md-6
                 label.form-label(for="editEndDate") Ngày kết thúc
-                input#editEndDate.form-control(type="date", name="endDate", required)
+                input#editEndDate.form-control(type="text", name="endDate", placeholder="dd/mm/yyyy", required)
+                .invalid-feedback Vui lòng nhập đúng định dạng ngày (dd/mm/yyyy)
             
             .mb-3
               label.form-label(for="editStatus") Trạng thái
@@ -672,8 +674,14 @@ block content
           // Điền dữ liệu vào form
           document.getElementById('editName').value = course.name;
           document.getElementById('editDescription').value = course.description;
-          document.getElementById('editStartDate').value = course.startDate;
-          document.getElementById('editEndDate').value = course.endDate;
+          
+          // Chuyển đổi định dạng ngày từ ISO sang dd/mm/yyyy
+          const startDate = new Date(course.startDate);
+          const endDate = new Date(course.endDate);
+          
+          document.getElementById('editStartDate').value = `${String(startDate.getDate()).padStart(2, '0')}/${String(startDate.getMonth() + 1).padStart(2, '0')}/${startDate.getFullYear()}`;
+          document.getElementById('editEndDate').value = `${String(endDate.getDate()).padStart(2, '0')}/${String(endDate.getMonth() + 1).padStart(2, '0')}/${endDate.getFullYear()}`;
+          
           document.getElementById('editStatus').value = course.status;
           
           // Lưu courseId vào form để sử dụng khi submit
@@ -699,6 +707,7 @@ block content
       showLoading();
 
       const courseId = this.dataset.courseId;
+      
       const formData = {
         name: document.getElementById('editName').value,
         description: document.getElementById('editDescription').value,
@@ -735,6 +744,44 @@ block content
         showNotification('error', 'Lỗi', error.message || 'Có lỗi xảy ra khi cập nhật khóa học');
       } finally {
         hideLoading();
+      }
+    });
+
+    // Reset form khi đóng modal chỉnh sửa
+    document.getElementById('editCourseModal').addEventListener('hidden.bs.modal', function () {
+      document.getElementById('editCourseForm').reset();
+    });
+
+    // Thêm sự kiện validate cho input ngày tháng trong form chỉnh sửa
+    document.getElementById('editStartDate').addEventListener('input', function(e) {
+      const value = e.target.value;
+      console.log('Edit start date input:', value);
+      
+      if (!value) {
+        this.setCustomValidity('');
+        return;
+      }
+
+      if (!validateDate(value)) {
+        this.setCustomValidity('Vui lòng nhập đúng định dạng ngày (dd/mm/yyyy)');
+      } else {
+        this.setCustomValidity('');
+      }
+    });
+
+    document.getElementById('editEndDate').addEventListener('input', function(e) {
+      const value = e.target.value;
+      console.log('Edit end date input:', value);
+      
+      if (!value) {
+        this.setCustomValidity('');
+        return;
+      }
+
+      if (!validateDate(value)) {
+        this.setCustomValidity('Vui lòng nhập đúng định dạng ngày (dd/mm/yyyy)');
+      } else {
+        this.setCustomValidity('');
       }
     });
 

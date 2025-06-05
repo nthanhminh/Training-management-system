@@ -6,7 +6,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -29,7 +29,19 @@ async function bootstrap() {
     app.use(passport.initialize());
     app.use(passport.session());
 
-    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalPipes(
+        new ValidationPipe({
+            whitelist: true,
+            forbidNonWhitelisted: true,
+            transform: true,
+            // Quan trọng để nhận toàn bộ mảng lỗi
+            stopAtFirstError: false, // Đừng dừng khi gặp lỗi đầu tiên
+            // validationError: {
+            //     target: false, // không trả về object gốc
+            //     value: false, // không trả về giá trị sai
+            // },
+        }),
+    );
 
     const viewsPath = join(__dirname, '..', 'src', 'views');
     app.setViewEngine('pug');

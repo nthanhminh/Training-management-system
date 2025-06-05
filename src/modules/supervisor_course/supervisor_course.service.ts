@@ -28,9 +28,6 @@ export class SupervisorCourseService extends BaseServiceAbstract<SupervisorCours
         const condition: any = {
             course: {
                 id: courseId,
-                creator: {
-                    id: user.id,
-                },
             },
         };
         if (search) {

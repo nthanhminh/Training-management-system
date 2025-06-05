@@ -1,5 +1,11 @@
 import { UsersService } from '@modules/users/user.services';
-import { Injectable, NotFoundException, Req, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
+import {
+    Injectable,
+    NotFoundException,
+    Req,
+    UnauthorizedException,
+    UnprocessableEntityException,
+} from '@nestjs/common';
 import { SignInDto, SignUpDto } from './dto/auth.dto';
 import * as argon2 from 'argon2';
 import { User } from '@modules/users/entity/user.entity';
@@ -9,7 +15,8 @@ import { CacheService } from '@modules/cache/cache.service';
 import { SendCodeDto, VerifyCodeDto } from './dto/verify.dto';
 import { VerifyService } from '@modules/queue/verify.service';
 import { RequestWithUser } from 'src/types/requests.type';
-import { AppResponse } from 'src/types/common.type';
+import { AppResponse, ResponseMessage } from 'src/types/common.type';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -145,5 +152,17 @@ export class AuthService {
         return {
             data: req.user ? true : false,
         };
+    }
+
+    async logout(@Req() request: Request): Promise<ResponseMessage> {
+        return new Promise((resolve, reject) => {
+            request.session.destroy((err) => {
+                if (err) {
+                    console.log(err);
+                    return reject(err);
+                }
+                resolve({ message: 'Logout' });
+            });
+        });
     }
 }

@@ -256,7 +256,7 @@ html(lang="vi")
 
     nav.navbar.navbar-expand-lg.navbar-dark
       .container-fluid
-        a.navbar-brand(href="views/supervisor")
+        a.navbar-brand(href="/views/supervisor")
           i.fas.fa-graduation-cap.me-2
           | Hệ thống Đào tạo
         button.navbar-toggler(type="button", data-bs-toggle="collapse", data-bs-target="#navbarNav")
@@ -288,7 +288,7 @@ html(lang="vi")
                 li
                   hr.dropdown-divider
                 li
-                  a.dropdown-item(href="/views/supervisor/logout")
+                  a.dropdown-item(href="#", onclick="handleLogout(event)")
                     i.fas.fa-sign-out-alt.me-2
                     | Đăng xuất
 
@@ -299,6 +299,25 @@ html(lang="vi")
     script(src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js")
     script(src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js")
     script.
+      // Hàm xử lý logout
+      async function handleLogout(event) {
+        event.preventDefault();
+        try {
+          const response = await fetch('/auth/logout', {
+            method: 'GET',
+            credentials: 'include'
+          });
+          
+          if (response.ok) {
+            window.location.href = '/views/supervisor/auth';
+          } else {
+            console.error('Logout failed');
+          }
+        } catch (error) {
+          console.error('Error during logout:', error);
+        }
+      }
+
       // Khởi tạo AOS
       AOS.init({
         duration: 800,
@@ -365,5 +384,41 @@ html(lang="vi")
             ease: 'power2.out'
           });
         });
-      }); 
+      });
+
+      // Xử lý lỗi 401
+      window.addEventListener('error', function(e) {
+        if (e.target.status === 401) {
+          window.location.href = '/views/supervisor/auth';
+        }
+      });
+
+      // Xử lý lỗi 401 cho fetch
+      const originalFetch = window.fetch;
+      window.fetch = function() {
+        return originalFetch.apply(this, arguments)
+          .then(response => {
+            if (response.status === 401) {
+              window.location.href = '/views/supervisor/auth';
+              return Promise.reject('Unauthorized');
+            }
+            return response;
+          });
+      };
+
+      // Xử lý lỗi 401 cho XMLHttpRequest
+      const originalXHR = window.XMLHttpRequest;
+      window.XMLHttpRequest = function() {
+        const xhr = new originalXHR();
+        const originalOpen = xhr.open;
+        xhr.open = function() {
+          xhr.addEventListener('load', function() {
+            if (xhr.status === 401) {
+              window.location.href = '/views/supervisor/auth';
+            }
+          });
+          return originalOpen.apply(this, arguments);
+        };
+        return xhr;
+      }; 
       
